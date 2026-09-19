@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Lean Strength Plan</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#8A6317">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Strength Plan">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F3F4F1;
+    --card: #FFFFFF;
+    --text: #17191A;
+    --muted: #62666B;
+    --line: #E1E3DF;
+    --success: #1E7E34;
+    --success-soft: #E7F4E9;
+
+    --d1: #8A6317;
+    --d1-soft: #F5ECD9;
+    --d2: #1D5393;
+    --d2-soft: #E4ECF7;
+    --d3: #9F3724;
+    --d3-soft: #F6E5E2;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #131517;
+      --card: #1C1F22;
+      --text: #ECEEEB;
+      --muted: #959A9E;
+      --line: #2C3034;
+      --success: #34A853;
+      --success-soft: #183321;
+
+      --d1: #E0B053;
+      --d1-soft: #302613;
+      --d2: #6A9FDE;
+      --d2-soft: #1B2635;
+      --d3: #E6856C;
+      --d3-soft: #35201C;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #131517;
+    --card: #1C1F22;
+    --text: #ECEEEB;
+    --muted: #959A9E;
+    --line: #2C3034;
+    --success: #34A853;
+    --success-soft: #183321;
+
+    --d1: #E0B053;
+    --d1-soft: #302613;
+    --d2: #6A9FDE;
+    --d2-soft: #1B2635;
+    --d3: #E6856C;
+    --d3-soft: #35201C;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Archivo', system-ui, -apple-system, sans-serif;
+    padding: 16px 16px 72px;
+    display: flex;
+    justify-content: center;
+  }
+  .wrap { width: 100%; max-width: 480px; }
+
+  header { margin-bottom: 10px; }
+  .kicker { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 4px; }
+  h1 {
+    font-family: 'Archivo Black', 'Archivo', sans-serif;
+    font-size: 26px;
+    line-height: 1.15;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+  }
+  .stats { display: flex; gap: 8px; flex-wrap: wrap; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; flex: 1 1 90px; }
+  .stat .v { font-weight: 800; font-size: 15px; }
+  .stat .l { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .cycle-status {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px 14px; margin-top: 10px; font-size: 13.5px; font-weight: 700;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .cycle-status .arrow { color: var(--muted); font-size: 12px; font-weight: 700; }
+
+  #timer-banner {
+    display: none;
+    position: sticky;
+    top: 12px;
+    z-index: 100;
+    background: var(--card);
+    border: 1.5px solid var(--success);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    animation: slideIn 0.2s ease-out;
+  }
+  #timer-banner.active { display: flex; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+  .timer-val { font-size: 22px; font-weight: 800; color: var(--success); font-variant-numeric: tabular-nums; }
+  .timer-btn { background: var(--line); border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 700; color: var(--text); cursor: pointer; }
+  .timer-btn:active { transform: scale(0.96); }
+
+  nav.tabs { display: flex; gap: 6px; margin: 18px 0 16px; }
+  nav.tabs button {
+    flex: 1; font-family: inherit; font-size: 13px; font-weight: 700;
+    padding: 10px 4px; border-radius: 8px; border: 1.5px solid var(--line);
+    background: var(--card); color: var(--muted); cursor: pointer; transition: all 0.15s ease;
+  }
+  nav.tabs button[data-day="1"].active { background: var(--d1); border-color: var(--d1); color: #fff; }
+  nav.tabs button[data-day="2"].active { background: var(--d2); border-color: var(--d2); color: #fff; }
+  nav.tabs button[data-day="3"].active { background: var(--d3); border-color: var(--d3); color: #fff; }
+
+  .day-panel { display: none; }
+  .day-panel.active { display: block; }
+
+  .day-panel[data-day="1"] { --accent: var(--d1); --accent-soft: var(--d1-soft); }
+  .day-panel[data-day="2"] { --accent: var(--d2); --accent-soft: var(--d2-soft); }
+  .day-panel[data-day="3"] { --accent: var(--d3); --accent-soft: var(--d3-soft); }
+
+  .day-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 8px; }
+  .day-title { font-family: 'Archivo Black', sans-serif; font-size: 20px; color: var(--accent); margin: 0; }
+  .day-header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .day-progress { font-size: 12px; color: var(--muted); font-weight: 700; white-space: nowrap; }
+  .reset-link { background: none; border: none; color: var(--muted); font-size: 12px; font-weight: 600; text-decoration: underline; cursor: pointer; padding: 0; }
+
+  .day-rationale { font-size: 13.5px; color: var(--muted); line-height: 1.45; margin: 0 0 16px; }
+  .group-label { font-size: 13px; font-weight: 700; color: var(--accent); margin: 18px 0 8px; padding-left: 8px; border-left: 3px solid var(--accent); }
+  .group-label:first-of-type { margin-top: 0; }
+
+  .ex-card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  }
+  .ex-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .ex-left { display: flex; gap: 10px; align-items: flex-start; }
+  .ex-num {
+    width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent);
+    font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .ex-name { font-weight: 700; font-size: 14.5px; line-height: 1.25; }
+  .ex-meta { font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+  .timer-trigger {
+    background: var(--accent-soft); color: var(--accent); border: none; border-radius: 5px;
+    padding: 2px 7px; font-size: 11.5px; font-weight: 700; cursor: pointer; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 3px;
+  }
+  .ex-target {
+    font-weight: 800; font-size: 13px; background: var(--accent-soft); color: var(--accent);
+    padding: 4px 8px; border-radius: 6px; white-space: nowrap;
+  }
+
+  .wt-row { display: flex; align-items: center; gap: 7px; }
+  .wt-row label { font-size: 11.5px; color: var(--muted); font-weight: 600; }
+  .wt-input {
+    width: 58px; padding: 5px 7px; border: 1px solid var(--line); border-radius: 6px;
+    background: var(--bg); color: var(--text); font-size: 13px; font-weight: 700; font-family: inherit;
+  }
+  .wt-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .wt-hint { font-size: 11px; color: var(--muted); }
+
+  .set-trackers { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+  .set-btn {
+    flex: 1 1 auto; background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
+    padding: 8px 6px; font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer;
+    text-align: center; transition: all 0.15s ease;
+  }
+  .set-btn:active { transform: scale(0.97); }
+  .set-btn.done { background: var(--success); border-color: var(--success); color: #FFFFFF; }
+
+  .finish-btn {
+    width: 100%; margin-top: 14px; padding: 13px; border-radius: 10px; border: none;
+    background: var(--accent); color: #fff; font-weight: 800; font-size: 14px;
+    font-family: inherit; cursor: pointer; transition: background 0.2s ease;
+  }
+  .finish-btn:active { transform: scale(0.98); }
+  .finish-btn.done-today { background: var(--success); }
+
+  .notes { margin-top: 24px; }
+  .note-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+  .note-card h2 { font-size: 14.5px; margin: 0 0 6px; font-weight: 800; }
+  .note-card p, .note-card li { font-size: 13px; line-height: 1.5; color: var(--text); margin: 0 0 6px; }
+  .note-card p:last-child, .note-card li:last-child { margin-bottom: 0; }
+  .note-card ul { margin: 0; padding-left: 18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="kicker">Hypertrophy &amp; Longevity Split</p>
+    <h1>Lean strength plan</h1>
+    <div class="stats">
+      <div class="stat"><div class="v">71.5 → 68 kg</div><div class="l">Target weight</div></div>
+      <div class="stat"><div class="v">1800 kcal</div><div class="l">Daily target</div></div>
+      <div class="stat"><div class="v">130 → 145g</div><div class="l">Protein/day, easing up</div></div>
+    </div>
+    <div class="cycle-status" id="cycle-status">Loading…</div>
+  </header>
+
+  <div id="timer-banner">
+    <div>
+      <span style="font-size:11px; color:var(--muted); font-weight:700; text-transform:uppercase;">Rest interval</span>
+      <div class="timer-val" id="timer-display">00:00</div>
+    </div>
+    <div style="display:flex; gap:6px;">
+      <button class="timer-btn" onclick="addSeconds(30)">+30s</button>
+      <button class="timer-btn" onclick="stopTimer()">Dismiss</button>
+    </div>
+  </div>
+
+  <nav class="tabs">
+    <button data-day="1" class="active">Chest &amp; Back</button>
+    <button data-day="2">Legs &amp; Forearm</button>
+    <button data-day="3">Shoulders &amp; Arms</button>
+  </nav>
+
+  <main>
+    <!-- DAY 1: CHEST & BACK -->
+    <section class="day-panel active" data-day="1">
+      <div class="day-header">
+        <h2 class="day-title">Chest &amp; Back</h2>
+        <div class="day-header-right">
+          <span class="day-progress" id="progress-d1">0/0 sets</span>
+          <button class="reset-link" onclick="resetDay(1)">Reset</button>
+        </div>
+      </div>
+      <p class="day-rationale">Scheduled directly after your rest day, so pressing power is fresh. Machine chest press safeguards the shoulder joint while you're in a deficit.</p>
+
+      <div class="group-label">Chest</div>
+      <div class="ex-card" data-ex="d1-e1">
+        <div class="ex-top">
+          <div class="ex-left"><span class="ex-num">1</span><div><div class="ex-name">Incline Dumbbell Press</div><div class="ex-meta">Upper chest (30° bench) · <button class="timer-trigger" onclick="startTimer(120)">⏱ Rest 2m</button></div></div></div>
+          <span class="ex-target">3 × 8–10</span>
+        </div>
+        <div class="wt-row"><label for="wt-d1-e1">Weight</label><input type="number" inputmode="decimal" step="0.5" id="wt-d1-e1" class="wt-input" data-key="wt_d1-e1" placeholder="kg"><span class="wt-hint">kg, each side · last used</span></div>
+        <div class="set-trackers">
+          <button class="set-btn" onclick="toggleSet(this, 120)">Set 1</button>
+          <button class="set-btn" onclick="toggleSet(this, 120)">Set 2</button>
+          <button class="set-btn" onclick="toggleSet(this, 120)">Set 3</button>
+        </div>
+      </div>
+
+      <div class="ex-card" data-ex="d1-e2">
+        <div class="ex-top">
+          <div class="ex-left"><span class="ex-num">2</span><div><div class="ex-name">Machine Chest Press</div><div class="ex-meta">Mid/lower sternal fibers · <button class="timer-trigger" onclick="startTimer(90)">⏱ Rest 90s</button></div></div></div>
+          <span class="ex-target">3 × 8–12</span>
+        </div>
+        <div class="wt-row"><label for="wt-d1-e2">Weight</label><input type="number" inputmode="decimal" step="0.5" id="wt-d1-e2" class="wt-input" data-key="wt_d1-e2" placeholder="kg"><span class="wt-hint">kg · last used</span></div>
+        <div class="set-trackers">
+          <button class="set-btn" onclick="toggleSet(this, 90)">Set 1</button>
+          <button class="set-btn" onclick="toggleSet(this, 90)">Set 2</button>
+          <button class="set-btn" onclick="toggleSet(this, 90)">Set 3</button>
+        </div>
+      </div>
+
+      <div class="ex-card" data-ex="d1-e3">
+        <div class="ex-top">
+          <div class="ex-left"><span class="ex-num">3</span><div><div class="ex-name">Machine Flyes</div><div class="ex-meta">Lengthened stretch &amp; inner pecs · <button class="timer-trigger" onclick="startTimer(60)">⏱ Rest 60s</button></div></div></div>
+          <span class="ex-target">2 × 12–15</span>
+        </div>
+        <div class="wt-row"><label for="wt-d1-e3">Weight</label><input type="number" inputmode="decimal" step="0.5" id="wt-d1-e3" class="wt-input" data-key="wt_d1-e3" placeholder="kg"><span class="wt-hint">kg · last used</span></div>
+        <div class="set-trackers">
+          <button class="set-btn" onclick="toggleSet(this, 60)">Set 1</button>
+          <button class="set-btn" onclick="toggleSet(this, 60)">Set 2</button>
+        </div>
+      </div>
+
+      <div class="group-label">Back</div>
+      <div class="ex-card" data-ex="d1-e4">
+        <div class="ex-top">
+          <div class="ex-left"><span class="ex-num">4</span><div><div class="ex-name">Lat Pulldown</div><div class="ex-meta">Upper lats &amp; back width · <button class="timer-trigger" onclick="startTimer(120)">⏱ Rest 2m</button></div></div></div>
+          <span class="ex-target">3 × 8–10</span>
+        </div>
+        <div class="wt-row"><label for="wt-d1-e4">Weight</label><input type="number" inputmode="decimal" step="0.5" id="wt-d1-e4" class="wt-input" data-key="wt_d1-e4" placeholder="kg"><span class="wt-hint">kg · last used</span></div>
+        <div class="set-trackers">
+          <button class="set-btn" onclick="toggleSet(this, 120)">Set 1</button>
+          <button class="set-btn" onclick="toggleSet(this, 120)">Set 2</button>
+          <button class="set-btn" onclick="toggleSet(this, 120)">Set 3</button>
+        </div>
+      </div>
+
+      <div class="ex-card" data-ex="d1-e5">
+        <div class="ex-top">
+          <div class="ex-left"><span class="ex-num">5</span><div><div class="ex-name">Seated Cable Row</div><div class="ex-meta">Mid-back, rhomboids &amp; lower traps · <button class="timer-trigger" onclick="startTimer(90)">⏱ Rest 90s</button></div></div></div>
+          <span class="ex-target">3 × 10–12</span>
+        </div>
+        <div class="wt-row"><label for="wt-d1-e5">Weight</label><input type="number" inputmode="decimal" step="0.5" id="wt-d1-e5" class="wt-input" data-key="wt_d1-e5" placeholder="kg"><span class="wt-hint">kg · last used</span></div>
+        <div class="set-trackers">
+          <button class="set-btn" onclick="toggleSet(this, 90)">Set 1</button>
+          <button class="set-btn" onclick="toggleSet(this, 90)">Set 2</button>
+          <button class="set-btn" onclick="toggleSet(this, 90)">Set 3</button>
+        </div>
+      </div>
+
+      <div class="ex-card" data-ex="d1-e6">
+        <div class="ex-top">
+          <div class="ex-left"><span class="ex-num">6</span><div><div class="ex-name">Machine Low Row</div><div class="ex-meta">Lower lat fibers, elbows tucked · <button class="timer-trigger" onclick="startTimer(60)">⏱ Rest 60s</button></div></div></div>
+          <span class="ex-target">2 × 10–12</span>
+        </div>
+        <div class="wt-row"><label for="wt-d1-e6">Weight</label><input type="number" inputmode="decimal" step="0.5" id="wt-d1-e6" class="wt-input" data-key="wt_d1-e6" placeholder="kg"><span class="wt-hint">kg · last used</span></div>
+        <div class="set-trackers">
+          <button class="set-btn" onclick="toggleSet(this, 60)">Set 1</button>
+          <button class="set-btn" onclick="toggleSet(this, 60)">Set 2</button>
+        </div>
+      </div>
+      <button class="finish-btn" onclick="finishDay(1)">✓ Finished today's session</button>
+    </section>
+
+    <!-- DAY 2: LEGS & FOREARMS -->
+    <section class="day-panel" data-day="2">
+      <div class="day-header">
+        <h2 class="day-title">Legs &amp; Forearm</h2>
+        <div class="day-header-right">
+          <span class="day-progress" id="progress-d2">0/0 sets</span>
+          <button class="reset-link" onclick="resetDay(2)">Reset</button>
+        </div>
+      </div>
+      <p class="day-rationale">Zero chest, back, shoulder, or arm involvement — this is what actually lets yesterday's pressing and pulling muscles recover, more than a rest day alone would.</p>
+
+      <div class="ex-card" data-ex="d2-e1">
+        <div class="ex-top">
+          <div class="ex-left"><span class="ex-num">1</span><div><div class="ex-name">Leg Press</div><div class="ex-meta">Quads &amp; glutes, spine fully braced · <button class="timer-trigger" onclick="startTimer(120)">⏱ Rest 2m</button></div></div></div>
+          <span class="ex-target">3 × 8–10</span>
+        </div>
+        <div class="wt-row"><label for="wt-d2-e1">Weight</label><input type="number" inputmode="decimal" step="2.5" id="wt-d2-e1" class="wt-input" data-key="wt_d2-e1" placeholder="kg"><span class="wt-hint">kg · last used</span></div>
+        <div class="set-trackers">
+          <button class="set-btn" onclick="toggleSet(this, 120)">Set 1</button>
+          <button class="set-btn" onclick="toggleSet(this, 120)">Set 2</button>
+          <button class="set-btn" onclick="toggleSet(this, 120)">Set 3</button>
+        </div>
+      </div>
+
+      <div class="ex-card" data-ex="d2-e2">
+        <div class="ex-top">
+          <div class="ex-left"><span class="ex-num">2</span><div><div class="ex-name">Leg Extension</div><div class="ex-meta">Quad peak isolation, pause 1s at top · <button class="timer-trigger" onclick="startTimer(60)">⏱ Rest 60s</button></div></div></div>
+          <span class="ex-target">3 × 12–15</span>
+        </div>
+        <div class="wt-row"><label for="wt-d2-e2">Weight</label><input type="number" inputmode="decimal" step="2.5" id="wt-d2-e2" class="wt-input" data-key="wt_d2-e2" placeholder="kg"><span class="wt-hint">kg · last used</span></div>
+        <div class="set-trackers">
+          <button class="set-btn" onclick="toggleSet(this, 60)">Set 1</button>
+          <button class="set-btn" onclick="toggleSet(this, 60)">Set 2</button>
+          <button class="set-btn" onclick="toggleSet(this, 60)">Set 3</button>
+        </div>
+      </div>
+
+      <div class="ex-card" data-ex="d2-e3">
+        <div class="ex-top">
+          <div class="ex-left"><span class="ex-num">3</span><div><div class="ex-name">Leg Curl</div><div class="ex-meta">Knee-flexion hamstrings · <button class="timer-trigger" onclick="startTimer(90)">⏱ Rest 90s</button></div></div></div>
+          <span class="ex-target">3 × 10–12</span>
+        </div>
+        <div class="wt-row"><label for="wt-d2-e3">Weight</label><input type="number" inputmode="decimal" step="2.5" id="wt-d2-e3" class="wt-input" data-key="wt_d2-e3" placeholder="kg"><span class="wt-hint">kg · last used</span></div>
+        <div class="set-trackers">
+          <button class="set-btn" onclick="toggleSet(this, 90)">Set 1</button>
+          <button class="set-btn" onclick="toggleSet(this, 90)">Set 2</button>
+          <button class="set-btn" onclick="toggleSet(this, 90)">Set 3</button>
+        </div>
+      </div>
+
+      <div class="ex-card" data-ex="d2-e4">
+        <div class="ex-top">
+          <div class="ex-left"><span class="ex-num">4</span><div><div class="ex-name">Dumbbell Walking Lunges</div><div class="ex-meta">Glutes &amp; adductors, upright torso · <button class="timer-trigger" onclick="startTimer(90)">⏱ Rest 90s</button></div></div></div>
+          <span class="ex-target">2 × 10/leg</span>
+        </div>
+        <div class="wt-row"><label for="wt-d2-e4">Weight</label><input type="number" inputmode="decimal" step="1" id="wt-d2-e4" class="wt-input" data-key="wt_d2-e4" placeholder="kg"><span class="wt-hint">kg each hand · last used</span></div>
+        <div class="set-trackers">
+          <button class="set-btn" onclick="toggleSet(this, 90)">Set 1</button>
+          <button class="set-btn" onclick="toggleSet(this, 90)">Set 2</button>
+        </div>
+      </div>
+
+      <div class="ex-card" data-ex="d2-e5">
+        <div class="ex-top">
+          <div class="ex-left"><span class="ex-num">5</span><div><div class="ex-name">Leg Press Calf Raise</div><div class="ex-meta">Straight-knee gastrocnemius &amp; soleus, 2s pause at bottom stretch · <button class="timer-trigger" onclick="startTimer(60)">⏱ Rest 60s</button></div></div></div>
+          <span class="ex-target">3 × 12–15</span>
+        </div>
+        <div class="wt-row"><label for="wt-d2-e5">Weight</label><input type="number" inputmode="decimal" step="2.5" id="wt-d2-e5" class="wt-input" data-key="wt_d2-e5" placeholder="kg"><span class="wt-hint">kg · last used</span></div>
+        <div class="set-trackers">
+          <button class="set-btn" onclick="toggleSet(this, 60)">Set 1</button>
+          <button class="set-btn" onclick="toggleSet(this, 60)">Set 2</button>
+          <button class="set-btn" onclick="toggleSet(this, 60)">Set 3</button>
+        </div>
+      </div>
+
+      <div class="ex-card" data-ex="d2-e6">
+        <div class="ex-top">
+          <div class="ex-left"><span class="ex-num">6</span><div><div class="ex-name">Forearm Curl + Reverse Curl</div><div class="ex-meta">Flexors &amp; extensors, back to back · <button class="timer-trigger" onclick="startTimer(45)">⏱ Rest 45s</button></div></div></div>
+          <span class="ex-target">2 × 15 each</span>
+        </div>
+        <div class="wt-row"><label for="wt-d2-e6">Weight</label><input type="number" inputmode="decimal" step="1" id="wt-d2-e6" class="wt-input" data-key="wt_d2-e6" placeholder="kg"><span class="wt-hint">kg · last used</span></div>
+        <div class="set-trackers">
+          <button class="set-btn" onclick="toggleSet(this, 45)">Set 1</button>
+          <button class="set-btn" onclick="toggleSet(this, 45)">Set 2</button>
+        </div>
+      </div>
+      <button class="finish-btn" onclick="finishDay(2)">✓ Finished today's session</button>
+    </section>
+
+    <!-- DAY 3: SHOULDERS & ARMS -->
+    <section class="day-panel" data-day="3">
+      <div class="day-header">
+        <h2 class="day-title">Shoulders &amp; Arms</h2>
+        <div class="day-header-right">
+          <span class="day-progress" id="progress-d3">0/0 sets</span>
+          <button class="reset-link" onclick="resetDay(3)">Reset</button>
+        </div>
+      </div>
+      <p class="day-rationale">Direct isolation on smaller heads without also driving a heavy compound press — that's already done on torso day.</p>
+
+      <div class="group-label">Shoulders</div>
+      <div class="ex-card" data-ex="d3-e1">
+        <div class="ex-top">
+          <div class="ex-left"><span class="ex-num">1</span><div><div class="ex-name">Seated Machine Shoulder Press</div><div class="ex-meta">Anterior &amp; lateral delts · <button class="timer-trigger" onclick="startTimer(120)">⏱ Rest 2m</button></div></div></div>
+          <span class="ex-target">3 × 8–10</span>
+        </div>
+        <div class="wt-row"><label for="wt-d3-e1">Weight</label><input type="number" inputmode="decimal" step="2.5" id="wt-d3-e1" class="wt-input" data-key="wt_d3-e1" placeholder="kg"><span class="wt-hint">kg · last used</span></div>
+        <div class="set-trackers">
+          <button class="set-btn" onclick="toggleSet(this, 120)">Set 1</button>
+          <button class="set-btn" onclick="toggleSet(this, 120)">Set 2</button>
+          <button class="set-btn" onclick="toggleSet(this, 120)">Set 3</button>
+        </div>
+      </div>
+
+      <div class="ex-card" data-ex="d3-e2">
+        <div class="ex-top">
+          <div class="ex-left"><span class="ex-num">2</span><div><div class="ex-name">Dumbbell Lateral Raise</div><div class="ex-meta">Side delt width, raise 30° in front · <button class="timer-trigger" onclick="startTimer(60)">⏱ Rest 60s</button></div></div></div>
+          <span class="ex-target">3 × 12–15</span>
+        </div>
+        <div class="wt-row"><label for="wt-d3-e2">Weight</label><input type="number" inputmode="decimal" step="0.5" id="wt-d3-e2" class="wt-input" data-key="wt_d3-e2" placeholder="kg"><span class="wt-hint">kg each hand · last used</span></div>
+        <div class="set-trackers">
+          <button class="set-btn" onclick="toggleSet(this, 60)">Set 1</button>
+          <button class="set-btn" onclick="toggleSet(this, 60)">Set 2</button>
+          <button class="set-btn" onclick="toggleSet(this, 60)">Set 3</button>
+        </div>
+      </div>
+
+      <div class="ex-card" data-ex="d3-e3">
+        <div class="ex-top">
+          <div class="ex-left"><span class="ex-num">3</span><div><div class="ex-name">Reverse Machine Fly</div><div class="ex-meta">Rear delts, balances chest pressing · <button class="timer-trigger" onclick="startTimer(60)">⏱ Rest 60s</button></div></div></div>
+          <span class="ex-target">3 × 12–15</span>
+        </div>
+        <div class="wt-row"><label for="wt-d3-e3">Weight</label><input type="number" inputmode="decimal" step="2.5" id="wt-d3-e3" class="wt-input" data-key="wt_d3-e3" placeholder="kg"><span class="wt-hint">kg · last used</span></div>
+        <div class="set-trackers">
+          <button class="set-btn" onclick="toggleSet(this, 60)">Set 1</button>
+          <button class="set-btn" onclick="toggleSet(this, 60)">Set 2</button>
+          <button class="set-btn" onclick="toggleSet(this, 60)">Set 3</button>
+        </div>
+      </div>
+
+      <div class="group-label">Arms</div>
+      <div class="ex-card" data-ex="d3-e4">
+        <div class="ex-top">
+          <div class="ex-left"><span class="ex-num">4</span><div><div class="ex-name">Overhead Triceps Extension</div><div class="ex-meta">Triceps long head, full stretch · <button class="timer-trigger" onclick="startTimer(75)">⏱ Rest 75s</button></div></div></div>
+          <span class="ex-target">3 × 10–12</span>
+        </div>
+        <div class="wt-row"><label for="wt-d3-e4">Weight</label><input type="number" inputmode="decimal" step="2.5" id="wt-d3-e4" class="wt-input" data-key="wt_d3-e4" placeholder="kg"><span class="wt-hint">kg · last used</span></div>
+        <div class="set-trackers">
+          <button class="set-btn" onclick="toggleSet(this, 75)">Set 1</button>
+          <button class="set-btn" onclick="toggleSet(this, 75)">Set 2</button>
+          <button class="set-btn" onclick="toggleSet(this, 75)">Set 3</button>
+        </div>
+      </div>
+
+      <div class="ex-card" data-ex="d3-e5">
+        <div class="ex-top">
+          <div class="ex-left"><span class="ex-num">5</span><div><div class="ex-name">1-Arm Cable Pressdown (Neutral Grip)</div><div class="ex-meta">Lateral/medial head, stacked wrists · <button class="timer-trigger" onclick="startTimer(45)">⏱ Rest 45s</button></div></div></div>
+          <span class="ex-target">2 × 12–15</span>
+        </div>
+        <div class="wt-row"><label for="wt-d3-e5">Weight</label><input type="number" inputmode="decimal" step="1" id="wt-d3-e5" class="wt-input" data-key="wt_d3-e5" placeholder="kg"><span class="wt-hint">kg · last used</span></div>
+        <div class="set-trackers">
+          <button class="set-btn" onclick="toggleSet(this, 45)">Set 1</button>
+          <button class="set-btn" onclick="toggleSet(this, 45)">Set 2</button>
+        </div>
+      </div>
+
+      <div class="ex-card" data-ex="d3-e6">
+        <div class="ex-top">
+          <div class="ex-left"><span class="ex-num">6</span><div><div class="ex-name">Incline Dumbbell Curl (1-Arm)</div><div class="ex-meta">Biceps long head, outer peak · <button class="timer-trigger" onclick="startTimer(75)">⏱ Rest 75s</button></div></div></div>
+          <span class="ex-target">3 × 8–10</span>
+        </div>
+        <div class="wt-row"><label for="wt-d3-e6">Weight</label><input type="number" inputmode="decimal" step="0.5" id="wt-d3-e6" class="wt-input" data-key="wt_d3-e6" placeholder="kg"><span class="wt-hint">kg · last used</span></div>
+        <div class="set-trackers">
+          <button class="set-btn" onclick="toggleSet(this, 75)">Set 1</button>
+          <button class="set-btn" onclick="toggleSet(this, 75)">Set 2</button>
+          <button class="set-btn" onclick="toggleSet(this, 75)">Set 3</button>
+        </div>
+      </div>
+
+      <div class="ex-card" data-ex="d3-e7">
+        <div class="ex-top">
+          <div class="ex-left"><span class="ex-num">7</span><div><div class="ex-name">Incline Hammer Curl</div><div class="ex-meta">Brachialis &amp; brachioradialis · <button class="timer-trigger" onclick="startTimer(60)">⏱ Rest 60s</button></div></div></div>
+          <span class="ex-target">2 × 10–12</span>
+        </div>
+        <div class="wt-row"><label for="wt-d3-e7">Weight</label><input type="number" inputmode="decimal" step="0.5" id="wt-d3-e7" class="wt-input" data-key="wt_d3-e7" placeholder="kg"><span class="wt-hint">kg · last used</span></div>
+        <div class="set-trackers">
+          <button class="set-btn" onclick="toggleSet(this, 60)">Set 1</button>
+          <button class="set-btn" onclick="toggleSet(this, 60)">Set 2</button>
+        </div>
+      </div>
+      <button class="finish-btn" onclick="finishDay(3)">✓ Finished today's session</button>
+    </section>
+  </main>
+
+  <section class="notes">
+    <div class="note-card">
+      <h2>Progression &amp; safety</h2>
+      <ul>
+        <li><strong>RIR standard:</strong> stop 1–2 reps shy of failure on most sets. On an 1800 kcal cut, grinding every set to failure adds fatigue you can't fully recover from.</li>
+        <li><strong>Controlled eccentrics:</strong> take a strict 3-second lowering on your first exercise or two each day — the heavier compound lifts. On the higher-rep isolation work, stay controlled but don't force the full 3 seconds; those sets are long enough already.</li>
+        <li><strong>Calf rule:</strong> 2-second dead pause at full bottom stretch on leg press calf raises.</li>
+        <li><strong>Progression:</strong> once every set of a lift hits the top of its rep range with good form, two sessions running, add the smallest jump available — log today's weight in the field next to each exercise so you can see it next time.</li>
+        <li><strong>Cycle sequence:</strong> Chest &amp; Back → Legs &amp; Forearm → Shoulders &amp; Arms → Rest → repeat. Tap "Finished today's session" at the bottom of a day to log it and clear the checkboxes for next time.</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h2>Matching your diet</h2>
+      <p>1800 kcal with 130g protein already supports holding onto muscle in a deficit. 140–150g (~2g/kg) is a legitimate upper range, but ease into it gradually rather than jumping straight there — your last bloodwork put uric acid at the top of the reference range, and your protein is entirely chicken. Increase slowly, keep hydration up, and it's worth rechecking that number if you hold protein higher for a while.</p>
+      <p>Maintenance is roughly 2200–2400 kcal for your height and weight, so 1800 kcal is a moderate 400–600 kcal deficit — enough to reach 68kg in about 7–10 weeks without eating into training.</p>
+      <p>If your lifts stall across the board or you feel flat for more than a week, bring calories back near maintenance for a couple weeks before continuing the cut.</p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // Tab switching
+  document.querySelectorAll('nav.tabs button').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var day = btn.getAttribute('data-day');
+      document.querySelectorAll('nav.tabs button').forEach(function(b) { b.classList.toggle('active', b === btn); });
+      document.querySelectorAll('.day-panel').forEach(function(p) { p.classList.toggle('active', p.getAttribute('data-day') === day); });
+    });
+  });
+
+  function switchToDay(day) {
+    var btn = document.querySelector('nav.tabs button[data-day="' + day + '"]');
+    if (btn) btn.click();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Set tracking
+  function getStorageKey(btn) {
+    var card = btn.closest('.ex-card');
+    var exId = card.getAttribute('data-ex');
+    var index = Array.from(btn.parentNode.children).indexOf(btn);
+    return 'tracker_' + exId + '_s' + index;
+  }
+
+  function initSetState() {
+    document.querySelectorAll('.set-btn').forEach(function(btn) {
+      var key = getStorageKey(btn);
+      try { if (localStorage.getItem(key) === 'done') btn.classList.add('done'); } catch (e) {}
+    });
+    updateProgress(1); updateProgress(2); updateProgress(3);
+  }
+
+  function toggleSet(btn, restSeconds) {
+    var key = getStorageKey(btn);
+    var isDone = btn.classList.toggle('done');
+    try {
+      if (isDone) { localStorage.setItem(key, 'done'); } else { localStorage.removeItem(key); }
+    } catch (e) {}
+    if (isDone) startTimer(restSeconds);
+    var panel = btn.closest('.day-panel');
+    updateProgress(panel.getAttribute('data-day'));
+  }
+
+  function resetDay(dayNum) {
+    var panel = document.querySelector('.day-panel[data-day="' + dayNum + '"]');
+    panel.querySelectorAll('.set-btn').forEach(function(btn) {
+      btn.classList.remove('done');
+      try { localStorage.removeItem(getStorageKey(btn)); } catch (e) {}
+    });
+    updateProgress(dayNum);
+  }
+
+  function updateProgress(dayNum) {
+    var panel = document.querySelector('.day-panel[data-day="' + dayNum + '"]');
+    if (!panel) return;
+    var all = panel.querySelectorAll('.set-btn');
+    var done = panel.querySelectorAll('.set-btn.done');
+    var el = document.getElementById('progress-d' + dayNum);
+    if (el) el.textContent = done.length + '/' + all.length + ' sets';
+  }
+
+  // Weight log persistence
+  function initWeights() {
+    document.querySelectorAll('.wt-input').forEach(function(inp) {
+      var key = inp.getAttribute('data-key');
+      try {
+        var v = localStorage.getItem(key);
+        if (v) inp.value = v;
+      } catch (e) {}
+      inp.addEventListener('change', function() {
+        try { localStorage.setItem(key, inp.value); } catch (e) {}
+      });
+    });
+  }
+
+  // Finish-day + cycle tracking
+  function finishDay(dayNum) {
+    var panel = document.querySelector('.day-panel[data-day="' + dayNum + '"]');
+    panel.querySelectorAll('.set-btn').forEach(function(btn) {
+      btn.classList.remove('done');
+      try { localStorage.removeItem(getStorageKey(btn)); } catch (e) {}
+    });
+    updateProgress(dayNum);
+
+    var today = new Date();
+    var iso = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+    try {
+      localStorage.setItem('cycle_last_day', String(dayNum));
+      localStorage.setItem('cycle_last_date', iso);
+    } catch (e) {}
+    renderCycleStatus();
+
+    var btn = panel.querySelector('.finish-btn');
+    var original = btn.textContent;
+    btn.textContent = '✓ Logged — nice work';
+    btn.classList.add('done-today');
+    setTimeout(function () { btn.textContent = original; btn.classList.remove('done-today'); }, 2200);
+  }
+
+  function computeNextUp() {
+    var names = { 1: 'Chest & Back', 2: 'Legs & Forearm', 3: 'Shoulders & Arms' };
+    var lastDay = null, lastDateStr = null;
+    try {
+      lastDay = localStorage.getItem('cycle_last_day');
+      lastDateStr = localStorage.getItem('cycle_last_date');
+    } catch (e) {}
+
+    if (!lastDay) return { type: 'day', day: 1, label: names[1] };
+    lastDay = parseInt(lastDay, 10);
+
+    if (lastDay === 3) {
+      var today = new Date();
+      var todayIso = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+      if (lastDateStr === todayIso) {
+        return { type: 'rest', nextLabel: names[1] };
+      }
+      return { type: 'day', day: 1, label: names[1] };
+    }
+    var nd = lastDay + 1;
+    return { type: 'day', day: nd, label: names[nd] };
+  }
+
+  function renderCycleStatus() {
+    var el = document.getElementById('cycle-status');
+    if (!el) return;
+    var info = computeNextUp();
+    if (info.type === 'rest') {
+      el.innerHTML = '<span>😌 Today: rest day — next up ' + info.nextLabel + '</span>';
+      el.onclick = null;
+      el.style.cursor = 'default';
+    } else {
+      el.innerHTML = '<span>🔥 Next up: ' + info.label + '</span><span class="arrow">Open →</span>';
+      el.style.cursor = 'pointer';
+      el.onclick = function () { switchToDay(info.day); };
+    }
+  }
+
+  // Rest timer
+  function playAlertChime() {
+    try {
+      var AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      var ctx = new AudioContext();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880.00, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.6);
+    } catch (e) {}
+  }
+
+  var timerInterval = null;
+  var secondsLeft = 0;
+
+  function updateTimerDisplay() {
+    var m = Math.floor(secondsLeft / 60);
+    var s = secondsLeft % 60;
+    document.getElementById('timer-display').textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function startTimer(sec) {
+    clearInterval(timerInterval);
+    secondsLeft = sec;
+    updateTimerDisplay();
+    document.getElementById('timer-banner').classList.add('active');
+    timerInterval = setInterval(function () {
+      secondsLeft--;
+      if (secondsLeft <= 0) {
+        clearInterval(timerInterval);
+        document.getElementById('timer-display').textContent = 'DONE!';
+        playAlertChime();
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+      } else {
+        updateTimerDisplay();
+      }
+    }, 1000);
+  }
+
+  function addSeconds(sec) { secondsLeft += sec; updateTimerDisplay(); }
+  function stopTimer() { clearInterval(timerInterval); document.getElementById('timer-banner').classList.remove('active'); }
+
+  window.addEventListener('DOMContentLoaded', function () {
+    initSetState();
+    initWeights();
+    renderCycleStatus();
+  });
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').catch(function () {});
+    });
+  }
+</script>
+</body>
+</html>
