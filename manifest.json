@@ -1,13 +1,13 @@
 {
-  "name": "Lean Strength Plan",
-  "short_name": "Strength Plan",
-  "description": "3-day training tracker with rest timers and weight logging",
+  "name": "Apex Terminal | Lean Strength",
+  "short_name": "ApexTerminal",
+  "description": "High-density strength tracking, tonnage analytics, and deficit telemetry",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#F3F4F1",
-  "theme_color": "#8A6317",
-  "orientation": "portrait",
+  "background_color": "#080B10",
+  "theme_color": "#0B0F17",
+  "orientation": "portrait-primary",
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
