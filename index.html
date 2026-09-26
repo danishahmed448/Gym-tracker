@@ -169,18 +169,31 @@
     box-shadow: 0 0 10px rgba(0, 229, 255, 0.15);
   }
 
-  /* SUB TABS (DAYS) */
+  /* SUB TABS (DAYS: MON–SAT, GYM CLOSED SUNDAY) */
   .split-subnav {
-    display: flex; gap: 6px; margin-bottom: 14px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 14px;
   }
   .sub-btn {
-    flex: 1; background: var(--bg-card); border: 1px solid var(--border);
+    background: var(--bg-card); border: 1px solid var(--border);
     color: var(--text-muted); font-family: var(--font-mono); font-size: 11px;
-    font-weight: 700; padding: 8px 4px; border-radius: 6px; cursor: pointer;
+    font-weight: 700; padding: 7px 4px; border-radius: 6px; cursor: pointer; line-height: 1.35;
   }
-  .sub-btn.active[data-day="1"] { border-color: var(--gold); color: var(--gold); background: var(--gold-glow); }
-  .sub-btn.active[data-day="2"] { border-color: var(--cyan); color: var(--cyan); background: rgba(0,229,255,0.1); }
-  .sub-btn.active[data-day="3"] { border-color: var(--purple); color: var(--purple); background: rgba(178,102,255,0.1); }
+  .sub-dow { display: block; font-size: 9.5px; font-weight: 600; letter-spacing: 0.06em; }
+  .sub-btn.today .sub-dow { color: var(--bull); }
+  .sub-btn.today .sub-dow::after { content: ' · TODAY'; }
+  .sub-btn.active[data-type="push"] { border-color: var(--gold); color: var(--gold); background: var(--gold-glow); }
+  .sub-btn.active[data-type="pull"] { border-color: var(--cyan); color: var(--cyan); background: rgba(0,229,255,0.1); }
+  .sub-btn.active[data-type="legs"] { border-color: var(--purple); color: var(--purple); background: rgba(178,102,255,0.1); }
+
+  .day-brief {
+    display: flex; justify-content: space-between; gap: 8px; margin-bottom: 10px;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--text-dim);
+  }
+  .rest-note {
+    display: none; background: var(--gold-glow); border: 1px solid var(--gold); border-radius: 8px;
+    padding: 10px 12px; margin-bottom: 12px; font-size: 12px; color: var(--text-dim); line-height: 1.5;
+  }
+  .rest-note b { display: block; color: var(--gold); font-family: var(--font-mono); font-size: 11.5px; margin-bottom: 2px; }
 
   /* VIEW CONTAINERS */
   .view-panel { display: none; }
@@ -196,7 +209,7 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.25);
   }
   .instrument-header {
-    display: flex; justify-content: space-between; align-items: flex-start;
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
     margin-bottom: 8px; border-bottom: 1px dashed var(--border); padding-bottom: 8px;
   }
   .inst-ticker { font-family: var(--font-mono); font-size: 13.5px; font-weight: 800; color: #fff; }
@@ -206,6 +219,8 @@
     padding: 3px 7px; border-radius: 4px; background: var(--bg-elevated); border: 1px solid var(--border-bright);
     color: var(--gold); white-space: nowrap;
   }
+  .inst-meta { text-align: right; }
+  .inst-rir { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--text-muted); margin-top: 5px; }
 
   /* SET ORDER TABLE */
   .order-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 11px; }
@@ -292,6 +307,19 @@
     font-family: var(--font-mono); font-size: 14px; padding: 6px; border-radius: 4px; margin-bottom: 8px;
   }
   .calc-result { font-family: var(--font-mono); font-size: 16px; font-weight: 800; color: var(--gold); }
+
+  /* WEEKLY VOLUME MAP */
+  .vol-row {
+    display: grid; grid-template-columns: 88px 1fr 34px; gap: 8px; align-items: center;
+    font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); padding: 3px 0;
+  }
+  .vol-row b { text-align: right; }
+  .vol-track {
+    position: relative; height: 8px; background: var(--bg-base);
+    border: 1px solid var(--border); border-radius: 4px; overflow: hidden;
+  }
+  .vol-track::after { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; border-left: 1px dashed var(--text-muted); }
+  .vol-fill { height: 100%; }
 </style>
 </head>
 <body>
@@ -301,7 +329,7 @@
   <header class="top-hud">
     <div class="hud-status">
       <div class="ping-dot"></div>
-      <span>APEX-v2.6 // LIVE</span>
+      <span>APEX-v3.0 // LIVE</span>
     </div>
     <div class="hud-metrics">
       <div class="hud-metric"><span>TONS</span><b id="hud-tonnage" style="color:var(--bull);">0.00t</b></div>
@@ -346,10 +374,10 @@
   <!-- CYCLE STATUS BAR -->
   <div class="cycle-bar" id="cycle-banner">
     <div>
-      <span style="color:var(--text-muted);">ACTIVE SPLIT:</span>
+      <span style="color:var(--text-muted);">TODAY:</span>
       <span class="cycle-tag" id="cycle-text">INITIALIZING…</span>
     </div>
-    <span style="color:var(--text-muted); font-size:11px;">SWITCH →</span>
+    <span style="color:var(--text-muted); font-size:11px;">OPEN →</span>
   </div>
 
   <!-- MAIN TERMINAL NAVIGATION -->
@@ -362,346 +390,17 @@
 
   <!-- ==================== VIEW 1: EXECUTION (WORKOUT SPLIT) ==================== -->
   <main id="view-execution" class="view-panel active">
-    <!-- Day Switcher Subtabs -->
-    <div class="split-subnav">
-      <button class="sub-btn active" data-day="1">DAY 1: CHEST/BACK</button>
-      <button class="sub-btn" data-day="2">DAY 2: LEGS/FOREARM</button>
-      <button class="sub-btn" data-day="3">DAY 3: SHOULDERS/ARMS</button>
+    <!-- Sunday notice (gym closed) -->
+    <div class="rest-note" id="rest-day-note">
+      <b>SUNDAY · GYM CLOSED — RECOVERY DAY</b>
+      Muscle is built while you recover. Today: 8–10k easy steps, 7–9 h sleep, hit your protein. Monday's session is loaded below.
     </div>
 
-    <!-- DAY 1 CONTAINER -->
-    <div class="day-group" id="day-pane-1">
-      <!-- Ex 1 -->
-      <div class="instrument-card" data-exid="d1_e1">
-        <div class="instrument-header">
-          <div>
-            <div class="inst-ticker">INCLINE DB PRESS</div>
-            <div class="inst-sub">Upper Pectorals (30° Bench)</div>
-            <button class="quick-rest" onclick="triggerRest(120)">⏱ Rest 120s</button>
-          </div>
-          <span class="inst-badge">3 × 8–10</span>
-        </div>
-        <table class="order-table">
-          <thead><tr><th>SET</th><th>KG LOAD</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr data-set="1"><td>#1</td><td><input type="number" step="0.5" class="in-wt" value="24"></td><td><input type="number" class="in-rp" value="10"></td><td class="rm-est">32kg</td><td><button class="exec-btn" onclick="executeSet(this, 120)">LOG</button></td></tr>
-            <tr data-set="2"><td>#2</td><td><input type="number" step="0.5" class="in-wt" value="24"></td><td><input type="number" class="in-rp" value="9"></td><td class="rm-est">31kg</td><td><button class="exec-btn" onclick="executeSet(this, 120)">LOG</button></td></tr>
-            <tr data-set="3"><td>#3</td><td><input type="number" step="0.5" class="in-wt" value="24"></td><td><input type="number" class="in-rp" value="8"></td><td class="rm-est">30kg</td><td><button class="exec-btn" onclick="executeSet(this, 120)">LOG</button></td></tr>
-          </tbody>
-        </table>
-      </div>
+    <!-- Day Switcher Subtabs (rendered from PROGRAM) -->
+    <div class="split-subnav" id="day-tabs"></div>
 
-      <!-- Ex 2 -->
-      <div class="instrument-card" data-exid="d1_e2">
-        <div class="instrument-header">
-          <div>
-            <div class="inst-ticker">MACHINE CHEST PRESS</div>
-            <div class="inst-sub">Sternal Fibers (Locked Shoulder Plain)</div>
-            <button class="quick-rest" onclick="triggerRest(90)">⏱ Rest 90s</button>
-          </div>
-          <span class="inst-badge">3 × 8–12</span>
-        </div>
-        <table class="order-table">
-          <thead><tr><th>SET</th><th>KG LOAD</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr data-set="1"><td>#1</td><td><input type="number" step="2.5" class="in-wt" value="55"></td><td><input type="number" class="in-rp" value="10"></td><td class="rm-est">73kg</td><td><button class="exec-btn" onclick="executeSet(this, 90)">LOG</button></td></tr>
-            <tr data-set="2"><td>#2</td><td><input type="number" step="2.5" class="in-wt" value="55"></td><td><input type="number" class="in-rp" value="10"></td><td class="rm-est">73kg</td><td><button class="exec-btn" onclick="executeSet(this, 90)">LOG</button></td></tr>
-            <tr data-set="3"><td>#3</td><td><input type="number" step="2.5" class="in-wt" value="55"></td><td><input type="number" class="in-rp" value="9"></td><td class="rm-est">71kg</td><td><button class="exec-btn" onclick="executeSet(this, 90)">LOG</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Ex 3 -->
-      <div class="instrument-card" data-exid="d1_e3">
-        <div class="instrument-header">
-          <div>
-            <div class="inst-ticker">MACHINE PEC FLYES</div>
-            <div class="inst-sub">Lengthened Pec Stretch &amp; Squeeze</div>
-            <button class="quick-rest" onclick="triggerRest(60)">⏱ Rest 60s</button>
-          </div>
-          <span class="inst-badge">2 × 12–15</span>
-        </div>
-        <table class="order-table">
-          <thead><tr><th>SET</th><th>KG LOAD</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr data-set="1"><td>#1</td><td><input type="number" step="2.5" class="in-wt" value="45"></td><td><input type="number" class="in-rp" value="12"></td><td class="rm-est">63kg</td><td><button class="exec-btn" onclick="executeSet(this, 60)">LOG</button></td></tr>
-            <tr data-set="2"><td>#2</td><td><input type="number" step="2.5" class="in-wt" value="45"></td><td><input type="number" class="in-rp" value="12"></td><td class="rm-est">63kg</td><td><button class="exec-btn" onclick="executeSet(this, 60)">LOG</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Ex 4 -->
-      <div class="instrument-card" data-exid="d1_e4">
-        <div class="instrument-header">
-          <div>
-            <div class="inst-ticker">LAT PULLDOWN</div>
-            <div class="inst-sub">Upper Lat Width (Controlled Eccentric)</div>
-            <button class="quick-rest" onclick="triggerRest(120)">⏱ Rest 120s</button>
-          </div>
-          <span class="inst-badge">3 × 8–10</span>
-        </div>
-        <table class="order-table">
-          <thead><tr><th>SET</th><th>KG LOAD</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr data-set="1"><td>#1</td><td><input type="number" step="2.5" class="in-wt" value="52"></td><td><input type="number" class="in-rp" value="10"></td><td class="rm-est">69kg</td><td><button class="exec-btn" onclick="executeSet(this, 120)">LOG</button></td></tr>
-            <tr data-set="2"><td>#2</td><td><input type="number" step="2.5" class="in-wt" value="52"></td><td><input type="number" class="in-rp" value="9"></td><td class="rm-est">67kg</td><td><button class="exec-btn" onclick="executeSet(this, 120)">LOG</button></td></tr>
-            <tr data-set="3"><td>#3</td><td><input type="number" step="2.5" class="in-wt" value="52"></td><td><input type="number" class="in-rp" value="8"></td><td class="rm-est">65kg</td><td><button class="exec-btn" onclick="executeSet(this, 120)">LOG</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Ex 5 -->
-      <div class="instrument-card" data-exid="d1_e5">
-        <div class="instrument-header">
-          <div>
-            <div class="inst-ticker">SEATED CABLE ROW</div>
-            <div class="inst-sub">Mid-Back, Rhomboids &amp; Lower Traps</div>
-            <button class="quick-rest" onclick="triggerRest(90)">⏱ Rest 90s</button>
-          </div>
-          <span class="inst-badge">3 × 10–12</span>
-        </div>
-        <table class="order-table">
-          <thead><tr><th>SET</th><th>KG LOAD</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr data-set="1"><td>#1</td><td><input type="number" step="2.5" class="in-wt" value="48"></td><td><input type="number" class="in-rp" value="11"></td><td class="rm-est">65kg</td><td><button class="exec-btn" onclick="executeSet(this, 90)">LOG</button></td></tr>
-            <tr data-set="2"><td>#2</td><td><input type="number" step="2.5" class="in-wt" value="48"></td><td><input type="number" class="in-rp" value="10"></td><td class="rm-est">64kg</td><td><button class="exec-btn" onclick="executeSet(this, 90)">LOG</button></td></tr>
-            <tr data-set="3"><td>#3</td><td><input type="number" step="2.5" class="in-wt" value="48"></td><td><input type="number" class="in-rp" value="10"></td><td class="rm-est">64kg</td><td><button class="exec-btn" onclick="executeSet(this, 90)">LOG</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Ex 6 -->
-      <div class="instrument-card" data-exid="d1_e6">
-        <div class="instrument-header">
-          <div>
-            <div class="inst-ticker">MACHINE LOW ROW</div>
-            <div class="inst-sub">Lower Lat Fibers, Elbows Tucked</div>
-            <button class="quick-rest" onclick="triggerRest(60)">⏱ Rest 60s</button>
-          </div>
-          <span class="inst-badge">2 × 10–12</span>
-        </div>
-        <table class="order-table">
-          <thead><tr><th>SET</th><th>KG LOAD</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr data-set="1"><td>#1</td><td><input type="number" step="2.5" class="in-wt" value="40"></td><td><input type="number" class="in-rp" value="12"></td><td class="rm-est">56kg</td><td><button class="exec-btn" onclick="executeSet(this, 60)">LOG</button></td></tr>
-            <tr data-set="2"><td>#2</td><td><input type="number" step="2.5" class="in-wt" value="40"></td><td><input type="number" class="in-rp" value="11"></td><td class="rm-est">54kg</td><td><button class="exec-btn" onclick="executeSet(this, 60)">LOG</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <button class="terminal-submit" onclick="finalizeWorkoutSession(1)">EXECUTE LOG &amp; STORE SESSION</button>
-    </div>
-
-    <!-- DAY 2 CONTAINER -->
-    <div class="day-group" id="day-pane-2" style="display:none;">
-      <!-- Ex 1 -->
-      <div class="instrument-card" data-exid="d2_e1">
-        <div class="instrument-header">
-          <div><div class="inst-ticker">LEG PRESS</div><div class="inst-sub">Quads &amp; Glute Hypertrophy</div><button class="quick-rest" onclick="triggerRest(120)">⏱ Rest 120s</button></div>
-          <span class="inst-badge">3 × 8–10</span>
-        </div>
-        <table class="order-table">
-          <thead><tr><th>SET</th><th>KG LOAD</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr data-set="1"><td>#1</td><td><input type="number" step="5" class="in-wt" value="140"></td><td><input type="number" class="in-rp" value="10"></td><td class="rm-est">186kg</td><td><button class="exec-btn" onclick="executeSet(this, 120)">LOG</button></td></tr>
-            <tr data-set="2"><td>#2</td><td><input type="number" step="5" class="in-wt" value="140"></td><td><input type="number" class="in-rp" value="9"></td><td class="rm-est">182kg</td><td><button class="exec-btn" onclick="executeSet(this, 120)">LOG</button></td></tr>
-            <tr data-set="3"><td>#3</td><td><input type="number" step="5" class="in-wt" value="140"></td><td><input type="number" class="in-rp" value="8"></td><td class="rm-est">177kg</td><td><button class="exec-btn" onclick="executeSet(this, 120)">LOG</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Ex 2 -->
-      <div class="instrument-card" data-exid="d2_e2">
-        <div class="instrument-header">
-          <div><div class="inst-ticker">LEG EXTENSION</div><div class="inst-sub">Quad Peak Shortening (1s Pause Top)</div><button class="quick-rest" onclick="triggerRest(60)">⏱ Rest 60s</button></div>
-          <span class="inst-badge">3 × 12–15</span>
-        </div>
-        <table class="order-table">
-          <thead><tr><th>SET</th><th>KG LOAD</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr data-set="1"><td>#1</td><td><input type="number" step="2.5" class="in-wt" value="45"></td><td><input type="number" class="in-rp" value="15"></td><td class="rm-est">67kg</td><td><button class="exec-btn" onclick="executeSet(this, 60)">LOG</button></td></tr>
-            <tr data-set="2"><td>#2</td><td><input type="number" step="2.5" class="in-wt" value="45"></td><td><input type="number" class="in-rp" value="13"></td><td class="rm-est">64kg</td><td><button class="exec-btn" onclick="executeSet(this, 60)">LOG</button></td></tr>
-            <tr data-set="3"><td>#3</td><td><input type="number" step="2.5" class="in-wt" value="45"></td><td><input type="number" class="in-rp" value="12"></td><td class="rm-est">63kg</td><td><button class="exec-btn" onclick="executeSet(this, 60)">LOG</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Ex 3 -->
-      <div class="instrument-card" data-exid="d2_e3">
-        <div class="instrument-header">
-          <div><div class="inst-ticker">SEATED LEG CURL</div><div class="inst-sub">Hamstring Knee-Flexion</div><button class="quick-rest" onclick="triggerRest(90)">⏱ Rest 90s</button></div>
-          <span class="inst-badge">3 × 10–12</span>
-        </div>
-        <table class="order-table">
-          <thead><tr><th>SET</th><th>KG LOAD</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr data-set="1"><td>#1</td><td><input type="number" step="2.5" class="in-wt" value="40"></td><td><input type="number" class="in-rp" value="12"></td><td class="rm-est">56kg</td><td><button class="exec-btn" onclick="executeSet(this, 90)">LOG</button></td></tr>
-            <tr data-set="2"><td>#2</td><td><input type="number" step="2.5" class="in-wt" value="40"></td><td><input type="number" class="in-rp" value="11"></td><td class="rm-est">54kg</td><td><button class="exec-btn" onclick="executeSet(this, 90)">LOG</button></td></tr>
-            <tr data-set="3"><td>#3</td><td><input type="number" step="2.5" class="in-wt" value="40"></td><td><input type="number" class="in-rp" value="10"></td><td class="rm-est">53kg</td><td><button class="exec-btn" onclick="executeSet(this, 90)">LOG</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Ex 4 -->
-      <div class="instrument-card" data-exid="d2_e4">
-        <div class="instrument-header">
-          <div><div class="inst-ticker">DB WALKING LUNGES</div><div class="inst-sub">Glutes &amp; Adductors (Kg Each Hand)</div><button class="quick-rest" onclick="triggerRest(90)">⏱ Rest 90s</button></div>
-          <span class="inst-badge">2 × 10/Leg</span>
-        </div>
-        <table class="order-table">
-          <thead><tr><th>SET</th><th>KG LOAD</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr data-set="1"><td>#1</td><td><input type="number" step="1" class="in-wt" value="16"></td><td><input type="number" class="in-rp" value="10"></td><td class="rm-est">21kg</td><td><button class="exec-btn" onclick="executeSet(this, 90)">LOG</button></td></tr>
-            <tr data-set="2"><td>#2</td><td><input type="number" step="1" class="in-wt" value="16"></td><td><input type="number" class="in-rp" value="10"></td><td class="rm-est">21kg</td><td><button class="exec-btn" onclick="executeSet(this, 90)">LOG</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Ex 5 -->
-      <div class="instrument-card" data-exid="d2_e5">
-        <div class="instrument-header">
-          <div><div class="inst-ticker">LEG PRESS CALF RAISE</div><div class="inst-sub">2s Dead-Pause at Deep Stretch</div><button class="quick-rest" onclick="triggerRest(60)">⏱ Rest 60s</button></div>
-          <span class="inst-badge">3 × 12–15</span>
-        </div>
-        <table class="order-table">
-          <thead><tr><th>SET</th><th>KG LOAD</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr data-set="1"><td>#1</td><td><input type="number" step="5" class="in-wt" value="100"></td><td><input type="number" class="in-rp" value="15"></td><td class="rm-est">150kg</td><td><button class="exec-btn" onclick="executeSet(this, 60)">LOG</button></td></tr>
-            <tr data-set="2"><td>#2</td><td><input type="number" step="5" class="in-wt" value="100"></td><td><input type="number" class="in-rp" value="14"></td><td class="rm-est">146kg</td><td><button class="exec-btn" onclick="executeSet(this, 60)">LOG</button></td></tr>
-            <tr data-set="3"><td>#3</td><td><input type="number" step="5" class="in-wt" value="100"></td><td><input type="number" class="in-rp" value="12"></td><td class="rm-est">140kg</td><td><button class="exec-btn" onclick="executeSet(this, 60)">LOG</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Ex 6 -->
-      <div class="instrument-card" data-exid="d2_e6">
-        <div class="instrument-header">
-          <div><div class="inst-ticker">FOREARM / REVERSE CURL</div><div class="inst-sub">Wrist Flexion &amp; Extension Superset</div><button class="quick-rest" onclick="triggerRest(45)">⏱ Rest 45s</button></div>
-          <span class="inst-badge">2 × 15</span>
-        </div>
-        <table class="order-table">
-          <thead><tr><th>SET</th><th>KG LOAD</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr data-set="1"><td>#1</td><td><input type="number" step="1" class="in-wt" value="12"></td><td><input type="number" class="in-rp" value="15"></td><td class="rm-est">18kg</td><td><button class="exec-btn" onclick="executeSet(this, 45)">LOG</button></td></tr>
-            <tr data-set="2"><td>#2</td><td><input type="number" step="1" class="in-wt" value="12"></td><td><input type="number" class="in-rp" value="15"></td><td class="rm-est">18kg</td><td><button class="exec-btn" onclick="executeSet(this, 45)">LOG</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <button class="terminal-submit" onclick="finalizeWorkoutSession(2)">EXECUTE LOG &amp; STORE SESSION</button>
-    </div>
-
-    <!-- DAY 3 CONTAINER -->
-    <div class="day-group" id="day-pane-3" style="display:none;">
-      <!-- Ex 1 -->
-      <div class="instrument-card" data-exid="d3_e1">
-        <div class="instrument-header">
-          <div><div class="inst-ticker">SEATED MACHINE SHOULDER PRESS</div><div class="inst-sub">Anterior &amp; Lateral Deltoids</div><button class="quick-rest" onclick="triggerRest(120)">⏱ Rest 120s</button></div>
-          <span class="inst-badge">3 × 8–10</span>
-        </div>
-        <table class="order-table">
-          <thead><tr><th>SET</th><th>KG LOAD</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr data-set="1"><td>#1</td><td><input type="number" step="2.5" class="in-wt" value="45"></td><td><input type="number" class="in-rp" value="10"></td><td class="rm-est">60kg</td><td><button class="exec-btn" onclick="executeSet(this, 120)">LOG</button></td></tr>
-            <tr data-set="2"><td>#2</td><td><input type="number" step="2.5" class="in-wt" value="45"></td><td><input type="number" class="in-rp" value="9"></td><td class="rm-est">58kg</td><td><button class="exec-btn" onclick="executeSet(this, 120)">LOG</button></td></tr>
-            <tr data-set="3"><td>#3</td><td><input type="number" step="2.5" class="in-wt" value="45"></td><td><input type="number" class="in-rp" value="8"></td><td class="rm-est">57kg</td><td><button class="exec-btn" onclick="executeSet(this, 120)">LOG</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Ex 2 -->
-      <div class="instrument-card" data-exid="d3_e2">
-        <div class="instrument-header">
-          <div><div class="inst-ticker">DB LATERAL RAISE</div><div class="inst-sub">Side Delt Width (Strict 30° Scaption)</div><button class="quick-rest" onclick="triggerRest(60)">⏱ Rest 60s</button></div>
-          <span class="inst-badge">3 × 12–15</span>
-        </div>
-        <table class="order-table">
-          <thead><tr><th>SET</th><th>KG LOAD</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr data-set="1"><td>#1</td><td><input type="number" step="0.5" class="in-wt" value="10"></td><td><input type="number" class="in-rp" value="15"></td><td class="rm-est">15kg</td><td><button class="exec-btn" onclick="executeSet(this, 60)">LOG</button></td></tr>
-            <tr data-set="2"><td>#2</td><td><input type="number" step="0.5" class="in-wt" value="10"></td><td><input type="number" class="in-rp" value="13"></td><td class="rm-est">14kg</td><td><button class="exec-btn" onclick="executeSet(this, 60)">LOG</button></td></tr>
-            <tr data-set="3"><td>#3</td><td><input type="number" step="0.5" class="in-wt" value="10"></td><td><input type="number" class="in-rp" value="12"></td><td class="rm-est">14kg</td><td><button class="exec-btn" onclick="executeSet(this, 60)">LOG</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Ex 3 -->
-      <div class="instrument-card" data-exid="d3_e3">
-        <div class="instrument-header">
-          <div><div class="inst-ticker">REVERSE MACHINE FLY</div><div class="inst-sub">Rear Delts &amp; Shoulder Integrity</div><button class="quick-rest" onclick="triggerRest(60)">⏱ Rest 60s</button></div>
-          <span class="inst-badge">3 × 12–15</span>
-        </div>
-        <table class="order-table">
-          <thead><tr><th>SET</th><th>KG LOAD</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr data-set="1"><td>#1</td><td><input type="number" step="2.5" class="in-wt" value="35"></td><td><input type="number" class="in-rp" value="15"></td><td class="rm-est">52kg</td><td><button class="exec-btn" onclick="executeSet(this, 60)">LOG</button></td></tr>
-            <tr data-set="2"><td>#2</td><td><input type="number" step="2.5" class="in-wt" value="35"></td><td><input type="number" class="in-rp" value="14"></td><td class="rm-est">51kg</td><td><button class="exec-btn" onclick="executeSet(this, 60)">LOG</button></td></tr>
-            <tr data-set="3"><td>#3</td><td><input type="number" step="2.5" class="in-wt" value="35"></td><td><input type="number" class="in-rp" value="12"></td><td class="rm-est">49kg</td><td><button class="exec-btn" onclick="executeSet(this, 60)">LOG</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Ex 4 -->
-      <div class="instrument-card" data-exid="d3_e4">
-        <div class="instrument-header">
-          <div><div class="inst-ticker">OVERHEAD TRICEPS EXTENSION</div><div class="inst-sub">Triceps Long-Head Full Stretch</div><button class="quick-rest" onclick="triggerRest(75)">⏱ Rest 75s</button></div>
-          <span class="inst-badge">3 × 10–12</span>
-        </div>
-        <table class="order-table">
-          <thead><tr><th>SET</th><th>KG LOAD</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr data-set="1"><td>#1</td><td><input type="number" step="2.5" class="in-wt" value="25"></td><td><input type="number" class="in-rp" value="12"></td><td class="rm-est">35kg</td><td><button class="exec-btn" onclick="executeSet(this, 75)">LOG</button></td></tr>
-            <tr data-set="2"><td>#2</td><td><input type="number" step="2.5" class="in-wt" value="25"></td><td><input type="number" class="in-rp" value="11"></td><td class="rm-est">34kg</td><td><button class="exec-btn" onclick="executeSet(this, 75)">LOG</button></td></tr>
-            <tr data-set="3"><td>#3</td><td><input type="number" step="2.5" class="in-wt" value="25"></td><td><input type="number" class="in-rp" value="10"></td><td class="rm-est">33kg</td><td><button class="exec-btn" onclick="executeSet(this, 75)">LOG</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Ex 5 -->
-      <div class="instrument-card" data-exid="d3_e5">
-        <div class="instrument-header">
-          <div><div class="inst-ticker">1-ARM CABLE PRESSDOWN</div><div class="inst-sub">Lateral &amp; Medial Head Tricep Squeeze</div><button class="quick-rest" onclick="triggerRest(45)">⏱ Rest 45s</button></div>
-          <span class="inst-badge">2 × 12–15</span>
-        </div>
-        <table class="order-table">
-          <thead><tr><th>SET</th><th>KG LOAD</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr data-set="1"><td>#1</td><td><input type="number" step="1" class="in-wt" value="14"></td><td><input type="number" class="in-rp" value="15"></td><td class="rm-est">21kg</td><td><button class="exec-btn" onclick="executeSet(this, 45)">LOG</button></td></tr>
-            <tr data-set="2"><td>#2</td><td><input type="number" step="1" class="in-wt" value="14"></td><td><input type="number" class="in-rp" value="13"></td><td class="rm-est">20kg</td><td><button class="exec-btn" onclick="executeSet(this, 45)">LOG</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Ex 6 -->
-      <div class="instrument-card" data-exid="d3_e6">
-        <div class="instrument-header">
-          <div><div class="inst-ticker">INCLINE DB CURL</div><div class="inst-sub">Biceps Long Head Outer Peak</div><button class="quick-rest" onclick="triggerRest(75)">⏱ Rest 75s</button></div>
-          <span class="inst-badge">3 × 8–10</span>
-        </div>
-        <table class="order-table">
-          <thead><tr><th>SET</th><th>KG LOAD</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr data-set="1"><td>#1</td><td><input type="number" step="1" class="in-wt" value="14"></td><td><input type="number" class="in-rp" value="10"></td><td class="rm-est">18kg</td><td><button class="exec-btn" onclick="executeSet(this, 75)">LOG</button></td></tr>
-            <tr data-set="2"><td>#2</td><td><input type="number" step="1" class="in-wt" value="14"></td><td><input type="number" class="in-rp" value="9"></td><td class="rm-est">18kg</td><td><button class="exec-btn" onclick="executeSet(this, 75)">LOG</button></td></tr>
-            <tr data-set="3"><td>#3</td><td><input type="number" step="1" class="in-wt" value="14"></td><td><input type="number" class="in-rp" value="8"></td><td class="rm-est">17kg</td><td><button class="exec-btn" onclick="executeSet(this, 75)">LOG</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Ex 7 -->
-      <div class="instrument-card" data-exid="d3_e7">
-        <div class="instrument-header">
-          <div><div class="inst-ticker">INCLINE HAMMER CURL</div><div class="inst-sub">Brachialis &amp; Brachioradialis Thickness</div><button class="quick-rest" onclick="triggerRest(60)">⏱ Rest 60s</button></div>
-          <span class="inst-badge">2 × 10–12</span>
-        </div>
-        <table class="order-table">
-          <thead><tr><th>SET</th><th>KG LOAD</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr data-set="1"><td>#1</td><td><input type="number" step="1" class="in-wt" value="14"></td><td><input type="number" class="in-rp" value="12"></td><td class="rm-est">19kg</td><td><button class="exec-btn" onclick="executeSet(this, 60)">LOG</button></td></tr>
-            <tr data-set="2"><td>#2</td><td><input type="number" step="1" class="in-wt" value="14"></td><td><input type="number" class="in-rp" value="10"></td><td class="rm-est">18kg</td><td><button class="exec-btn" onclick="executeSet(this, 60)">LOG</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <button class="terminal-submit" onclick="finalizeWorkoutSession(3)">EXECUTE LOG &amp; STORE SESSION</button>
-    </div>
+    <!-- Day Panes (rendered from PROGRAM) -->
+    <div id="day-panes"></div>
   </main>
 
   <!-- ==================== VIEW 2: ANALYTICS & CHARTS ==================== -->
@@ -709,7 +408,7 @@
     <div class="chart-box">
       <div class="chart-title-bar">
         <span class="chart-title">SESSION TONNAGE (KG VOL)</span>
-        <div class="chart-legend"><span style="color:var(--bull);">■ Bullish Gain</span><span style="color:var(--bear);">■ Deload</span></div>
+        <div class="chart-legend"><span style="color:var(--bull);">■ ≥ Last Same Day</span><span style="color:var(--bear);">■ Below</span></div>
       </div>
       <div class="canvas-container">
         <canvas id="canvas-tonnage"></canvas>
@@ -761,9 +460,32 @@
     <div class="instrument-card">
       <div class="inst-ticker" style="color:var(--gold); margin-bottom:6px;">NUTRITION &amp; RECOVERY TELEMETRY</div>
       <p style="font-size:12px; color:var(--text-dim); line-height:1.5;">
-        • <b>1800 Kcal Target:</b> Moderate 400–600 kcal deficit relative to 2300 kcal maintenance.<br>
-        • <b>130g → 145g Protein Ramp:</b> Ramp up gradually to respect upper reference uric acid levels. Hydrate with minimum 3.5L water/day.<br>
-        • <b>RIR 1–2 Policy:</b> Leave 1–2 repetitions in reserve on heavy compounds to prevent systemic CNS fatigue during caloric restriction.
+        • <b>1800 Kcal Target:</b> Moderate 400–600 kcal deficit relative to 2300 kcal maintenance. Aim to lose 0.5–1% bodyweight/week (≈0.35–0.7 kg); faster cuts cost muscle.<br>
+        • <b>130g → 145g Protein Ramp:</b> ≈2 g/kg, top of the 1.6–2.2 g/kg range that best protects muscle in a deficit. Split over 3–5 meals. Ramp up gradually to respect upper reference uric acid levels. Hydrate with minimum 3.5L water/day.<br>
+        • <b>8–10k Steps Daily:</b> Burns extra fat without eating into recovery. Sunday (gym closed) = long easy walk.<br>
+        • <b>Sleep 7–9 h:</b> Short sleep while dieting shifts weight loss from fat toward muscle.<br>
+        • <b>Creatine Monohydrate 3–5 g/day:</b> Best-supported supplement for muscle &amp; strength. Clear it with your doctor first given the uric acid monitoring.
+      </p>
+    </div>
+
+    <div class="instrument-card">
+      <div class="inst-ticker" style="color:var(--cyan); margin-bottom:6px;">HYPERTROPHY RULES (EVIDENCE-BASED)</div>
+      <p style="font-size:12px; color:var(--text-dim); line-height:1.5;">
+        • <b>6-Day PPL, Mon–Sat:</b> Every muscle trained 2×/week at ~10–20 hard sets/week. Sunday is full rest (gym closed).<br>
+        • <b>Effort:</b> Compounds at RIR 1–2, isolations at RIR 0–1 (last set may reach failure). Sets far from failure barely count.<br>
+        • <b>Train the Stretch:</b> Deep ranges and long-length exercises (incline curls, overhead extensions, seated leg curls, deep flyes) build more muscle.<br>
+        • <b>Rest:</b> 2–3 min on big lifts, 60–90 s on isolations. Very short rests on compounds reduce growth.<br>
+        • <b>Double Progression:</b> Hit the top of the rep range on every set → the app adds weight for next session.<br>
+        • <b>Tempo &amp; Warm-Up:</b> Control the lowering (~2 s), no bouncing. Do 2 ramp-up sets (~50%, ~75%) before the first lift.<br>
+        • <b>Deload When Needed:</b> Reps drop 2 sessions in a row or joints ache → 1 week at half the sets, same weights.
+      </p>
+    </div>
+
+    <div class="instrument-card">
+      <div class="inst-ticker" style="color:var(--bull); margin-bottom:6px;">WEEKLY VOLUME MAP (HARD SETS)</div>
+      <div id="volume-map"></div>
+      <p style="font-size:10.5px; color:var(--text-muted); line-height:1.4; margin-top:8px;">
+        Direct set = 1, helper muscle = 0.5. Dashed line = 10 sets (growth zone 10–20). Traps, forearms &amp; lower back also get indirect work from rows, squats &amp; curls.
       </p>
     </div>
   </section>
@@ -771,6 +493,105 @@
 </div>
 
 <script>
+  // TRAINING PROGRAM — 6-day Push/Pull/Legs, Mon–Sat (gym closed Sunday).
+  // Each muscle is hit 2×/week. m = weekly volume share (direct set = 1, helper muscle = 0.5).
+  // lo/hi = rep range for double progression, inc = load jump once every set reaches hi.
+  const PROGRAM = [
+    { key: 'pushA', dow: 1, label: 'MON', name: 'Push A', focus: 'Chest Focus', type: 'push', ex: [
+      { id: 'pa_bench', name: 'BENCH PRESS', cue: 'Mid Chest · 2s Lowering, Brief Pause on Chest', sets: 3, lo: 6, hi: 8, rest: 180, rir: '1–2', wt: 50, inc: 2.5, m: { Chest: 1, 'Front Delts': 0.5, Triceps: 0.5 } },
+      { id: 'pa_incline', name: 'INCLINE DUMBBELL PRESS', cue: 'Upper Chest · 30° Bench, Deep Stretch at Bottom', sets: 3, lo: 8, hi: 10, rest: 120, rir: '1–2', wt: 24, inc: 2, m: { Chest: 1, 'Front Delts': 0.5, Triceps: 0.5 } },
+      { id: 'pa_mfly', name: 'MACHINE FLYES', cue: 'Full Stretch, 1s Squeeze · Last Set to Failure', sets: 2, lo: 12, hi: 15, rest: 90, rir: '0–1', wt: 45, inc: 2.5, m: { Chest: 1 } },
+      { id: 'pa_lateral', name: 'DUMBBELL LATERAL RAISE', cue: 'Side Delt Width · Lead With Elbows, Slight Forward Lean', sets: 3, lo: 12, hi: 15, rest: 60, rir: '0–1', wt: 10, inc: 1, m: { 'Side Delts': 1 } },
+      { id: 'pa_ohext', name: 'OVERHEAD TRICEP EXTENSION', cue: 'Long Head Stretch · Grows Triceps More Than Pushdowns', sets: 3, lo: 10, hi: 12, rest: 90, rir: '0–1', wt: 25, inc: 2.5, m: { Triceps: 1 } },
+      { id: 'pa_pushdown', name: 'TRICEPS PUSH DOWN', cue: 'Elbows Pinned to Sides, Full Lockout', sets: 2, lo: 12, hi: 15, rest: 60, rir: '0–1', wt: 25, inc: 2.5, m: { Triceps: 1 } }
+    ]},
+    { key: 'pullA', dow: 2, label: 'TUE', name: 'Pull A', focus: 'Lat Width', type: 'pull', ex: [
+      { id: 'la_pulldown', name: 'LAT PULLDOWN', cue: 'Lat Width · Full Stretch Up Top, Elbows to Ribs', sets: 3, lo: 8, hi: 10, rest: 120, rir: '1–2', wt: 52, inc: 2.5, m: { Back: 1, Biceps: 0.5 } },
+      { id: 'la_cablerow', name: 'SEATED CABLE ROW', cue: 'Mid-Back · Let Shoulders Reach Forward, Then Squeeze', sets: 3, lo: 8, hi: 12, rest: 120, rir: '1–2', wt: 48, inc: 2.5, m: { Back: 1, 'Rear Delts': 0.5, Biceps: 0.5 } },
+      { id: 'la_lowrow', name: 'MACHINE LOW ROW', cue: 'Lower Lats · Elbows Tucked, Pull to Hips', sets: 2, lo: 10, hi: 12, rest: 90, rir: '1', wt: 40, inc: 2.5, m: { Back: 1, Biceps: 0.5 } },
+      { id: 'la_revfly', name: 'REVERSE MACHINE FLY', cue: 'Rear Delts · Soft Elbows, Sweep Arms Wide', sets: 3, lo: 12, hi: 15, rest: 60, rir: '0–1', wt: 35, inc: 2.5, m: { 'Rear Delts': 1 } },
+      { id: 'la_inclcurl', name: 'INCLINE DUMBBELL CURL (ONE ARM)', cue: 'Biceps Long Head · Arm Hangs Behind Body = Stretch', sets: 3, lo: 8, hi: 12, rest: 75, rir: '0–1', wt: 14, inc: 1, m: { Biceps: 1 } },
+      { id: 'la_preacher', name: 'MACHINE PREACHER CURL', cue: 'Slow Through the Stretched Bottom Half', sets: 2, lo: 10, hi: 12, rest: 60, rir: '0–1', wt: 25, inc: 2.5, m: { Biceps: 1 } }
+    ]},
+    { key: 'legsA', dow: 3, label: 'WED', name: 'Legs A', focus: 'Quads', type: 'legs', ex: [
+      { id: 'lga_squat', name: 'BACK SQUAT', cue: 'Quads & Glutes · Below Parallel, Controlled Descent', sets: 3, lo: 6, hi: 8, rest: 180, rir: '2', wt: 60, inc: 2.5, m: { Quads: 1, Glutes: 1, 'Lower Back': 0.5 } },
+      { id: 'lga_legcurl', name: 'LEG CURL', cue: 'Hamstrings · Use Seated Machine if Available (More Growth)', sets: 3, lo: 10, hi: 12, rest: 90, rir: '0–1', wt: 40, inc: 2.5, m: { Hamstrings: 1 } },
+      { id: 'lga_legext', name: 'LEG EXTENSION', cue: 'Quads · Lean Back Slightly, 1s Squeeze at Top', sets: 3, lo: 12, hi: 15, rest: 90, rir: '0–1', wt: 45, inc: 2.5, m: { Quads: 1 } },
+      { id: 'lga_calf', name: 'SEATED CALF RAISE', cue: 'Calves · 2s Pause in the Deep Stretch', sets: 4, lo: 12, hi: 15, rest: 60, rir: '0–1', wt: 40, inc: 2.5, m: { Calves: 1 } },
+      { id: 'lga_shrug', name: 'PLATE SHRUG', cue: 'Upper Traps · Straight Up, 1s Hold at Top', sets: 3, lo: 12, hi: 15, rest: 60, rir: '0–1', wt: 40, inc: 5, m: { Traps: 1 } }
+    ]},
+    { key: 'pushB', dow: 4, label: 'THU', name: 'Push B', focus: 'Shoulders & Upper Chest', type: 'push', ex: [
+      { id: 'pb_incline', name: 'INCLINE DUMBBELL PRESS', cue: 'Upper Chest · 30° Bench, Deep Stretch at Bottom', sets: 3, lo: 8, hi: 10, rest: 120, rir: '1–2', wt: 24, inc: 2, m: { Chest: 1, 'Front Delts': 0.5, Triceps: 0.5 } },
+      { id: 'pb_shpress', name: 'SEATED MACHINE SHOULDER PRESS', cue: 'Front & Side Delts · Full Depth, Controlled', sets: 3, lo: 8, hi: 10, rest: 120, rir: '1–2', wt: 45, inc: 2.5, m: { 'Front Delts': 1, 'Side Delts': 0.5, Triceps: 0.5 } },
+      { id: 'pb_inclfly', name: 'INCLINE DUMBBELL FLYES', cue: 'Upper Chest · Deep Stretch, Stop Short of Top', sets: 2, lo: 10, hi: 12, rest: 90, rir: '1', wt: 10, inc: 2, m: { Chest: 1 } },
+      { id: 'pb_lateral', name: 'DUMBBELL LATERAL RAISE', cue: 'Side Delt Width · Last Set: Add Bottom-Half Partials', sets: 4, lo: 15, hi: 20, rest: 60, rir: '0–1', wt: 8, inc: 1, m: { 'Side Delts': 1 } },
+      { id: 'pb_dips', name: 'DIPS', cue: 'Triceps & Lower Chest · Slight Lean · +KG = Added Weight', sets: 3, lo: 8, hi: 12, rest: 120, rir: '1–2', wt: 0, inc: 2.5, bw: true, m: { Triceps: 1, Chest: 0.5, 'Front Delts': 0.5 } },
+      { id: 'pb_1arm', name: '1-ARM TRICEPS CABLE PRESS DOWN', cue: 'Lateral & Medial Heads · Full Lockout', sets: 2, lo: 12, hi: 15, rest: 60, rir: '0–1', wt: 14, inc: 2.5, m: { Triceps: 1 } }
+    ]},
+    { key: 'pullB', dow: 5, label: 'FRI', name: 'Pull B', focus: 'Back Thickness & Arms', type: 'pull', ex: [
+      { id: 'lb_pullup', name: 'PULL UPS', cue: 'Lats · Dead Hang to Chin Over Bar · +KG = Added Weight', sets: 3, lo: 6, hi: 10, rest: 150, rir: '1–2', wt: 0, inc: 2.5, bw: true, m: { Back: 1, Biceps: 0.5 } },
+      { id: 'lb_dbrow', name: 'DUMBBELL BENT OVER ROW', cue: 'Mid-Back · Flat Back, Pull to Hip, Full Stretch', sets: 3, lo: 8, hi: 12, rest: 120, rir: '1–2', wt: 24, inc: 2, m: { Back: 1, 'Rear Delts': 0.5, Biceps: 0.5, 'Lower Back': 0.5 } },
+      { id: 'lb_uprow', name: 'CABLE UPRIGHT ROW', cue: 'Side Delts & Traps · Wide Grip, Elbows Lead to Chest Height', sets: 3, lo: 12, hi: 15, rest: 60, rir: '0–1', wt: 25, inc: 2.5, m: { 'Side Delts': 1, Traps: 0.5 } },
+      { id: 'lb_revfly', name: 'REVERSE MACHINE FLY', cue: 'Rear Delts · Higher Reps, Constant Tension', sets: 2, lo: 15, hi: 20, rest: 60, rir: '0–1', wt: 30, inc: 2.5, m: { 'Rear Delts': 1 } },
+      { id: 'lb_hammer', name: 'INCLINE DUMBBELL HAMMER CURL', cue: 'Brachialis & Forearms · Both Arms, Neutral Grip', sets: 3, lo: 10, hi: 12, rest: 75, rir: '0–1', wt: 14, inc: 1, m: { Biceps: 1, Forearms: 0.5 } },
+      { id: 'lb_cablecurl', name: 'CABLE BICEPS CURL', cue: 'Constant Tension · Squeeze at Top', sets: 2, lo: 12, hi: 15, rest: 60, rir: '0–1', wt: 20, inc: 2.5, m: { Biceps: 1 } }
+    ]},
+    { key: 'legsB', dow: 6, label: 'SAT', name: 'Legs B', focus: 'Glutes & Hamstrings', type: 'legs', ex: [
+      { id: 'lgb_legpress', name: 'LEG PRESS', cue: 'Quads & Glutes · Deep Range, No Lower-Back Rounding', sets: 3, lo: 10, hi: 12, rest: 150, rir: '1–2', wt: 140, inc: 5, m: { Quads: 1, Glutes: 0.5 } },
+      { id: 'lgb_lunge', name: 'DUMBBELL WALKING LUNGES', cue: 'Glutes & Quads · Long Stride · KG Each Hand', sets: 2, lo: 10, hi: 12, unit: '/leg', rest: 120, rir: '1–2', wt: 16, inc: 2, m: { Glutes: 1, Quads: 1 } },
+      { id: 'lgb_legcurl', name: 'LEG CURL', cue: 'Hamstrings · Seated Machine if Available, 2s Lowering', sets: 3, lo: 10, hi: 12, rest: 90, rir: '0–1', wt: 40, inc: 2.5, m: { Hamstrings: 1 } },
+      { id: 'lgb_pullthru', name: 'CABLE PULL THROUGH', cue: 'Glutes & Hamstrings · Rope Between Legs, Hinge Hips Back', sets: 3, lo: 12, hi: 15, rest: 90, rir: '1', wt: 30, inc: 2.5, m: { Glutes: 1, Hamstrings: 0.5, 'Lower Back': 0.5 } },
+      { id: 'lgb_calf', name: 'SEATED CALF RAISE', cue: 'Calves · 2s Pause in the Deep Stretch', sets: 3, lo: 15, hi: 20, rest: 60, rir: '0–1', wt: 35, inc: 2.5, m: { Calves: 1 } },
+      { id: 'lgb_forearm', name: 'FOREARM MACHINE CURL', cue: 'Wrist Flexors · Alternate With Reverse Curl', sets: 2, lo: 15, hi: 20, rest: 45, rir: '0–1', wt: 20, inc: 2.5, m: { Forearms: 1 } },
+      { id: 'lgb_revforearm', name: 'REVERSE FOREARM MACHINE CURL', cue: 'Wrist Extensors · Alternate With Forearm Curl', sets: 2, lo: 15, hi: 20, rest: 45, rir: '0–1', wt: 12, inc: 2.5, m: { Forearms: 1 } }
+    ]}
+  ];
+
+  const EXERCISE_INDEX = {};
+  PROGRAM.forEach(d => d.ex.forEach(e => { EXERCISE_INDEX[e.id] = e; }));
+
+  function renderExercise(e) {
+    const rows = Array.from({ length: e.sets }, (_, i) =>
+      `<tr data-set="${i + 1}"><td>#${i + 1}</td><td><input type="number" step="${e.inc}" class="in-wt" value="${e.wt}"></td><td><input type="number" class="in-rp" value="${e.lo}"></td><td class="rm-est">0kg</td><td><button class="exec-btn" onclick="executeSet(this, ${e.rest})">LOG</button></td></tr>`
+    ).join('');
+    return `
+      <div class="instrument-card" data-exid="${e.id}"${e.bw ? ' data-bw="1"' : ''}>
+        <div class="instrument-header">
+          <div>
+            <div class="inst-ticker">${e.name}</div>
+            <div class="inst-sub">${e.cue}</div>
+            <button class="quick-rest" onclick="triggerRest(${e.rest})">⏱ Rest ${e.rest}s</button>
+          </div>
+          <div class="inst-meta">
+            <span class="inst-badge">${e.sets} × ${e.lo}–${e.hi}${e.unit || ''}</span>
+            <div class="inst-rir">RIR ${e.rir}</div>
+          </div>
+        </div>
+        <table class="order-table">
+          <thead><tr><th>SET</th><th>${e.bw ? '+KG' : 'KG LOAD'}</th><th>REPS</th><th>1RM EST</th><th>ACTION</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }
+
+  function renderProgram() {
+    document.getElementById('day-tabs').innerHTML = PROGRAM.map(d =>
+      `<button class="sub-btn" data-day="${d.key}" data-type="${d.type}"><span class="sub-dow">${d.label}</span>${d.name.toUpperCase()}</button>`
+    ).join('');
+    document.getElementById('day-panes').innerHTML = PROGRAM.map(d => {
+      const sets = d.ex.reduce((n, e) => n + e.sets, 0);
+      // ~40s per working set + prescribed rest + ~8 min warm-up
+      const mins = Math.round((d.ex.reduce((s, e) => s + e.sets * (e.rest + 40), 0) + 480) / 60);
+      return `
+        <div class="day-group" id="day-pane-${d.key}" style="display: none;">
+          <div class="day-brief"><span>${d.name.toUpperCase()} · ${d.focus.toUpperCase()}</span><span>${sets} SETS · ~${mins} MIN</span></div>
+          ${d.ex.map(renderExercise).join('')}
+          <button class="terminal-submit" onclick="finalizeWorkoutSession('${d.key}')">EXECUTE LOG &amp; STORE SESSION</button>
+        </div>`;
+    }).join('');
+  }
+  renderProgram();
+
   // AUDIO SYNTHESIZER (Web Audio API)
   let audioCtx = null;
   function getAudioContext() {
@@ -822,13 +643,19 @@
   });
 
   // DAY SUBTABS
+  let activeDayKey = null;
+
+  function selectDay(key) {
+    activeDayKey = key;
+    document.querySelectorAll('.sub-btn').forEach(b => b.classList.toggle('active', b.dataset.day === key));
+    document.querySelectorAll('.day-group').forEach(g => g.style.display = 'none');
+    document.getElementById('day-pane-' + key).style.display = 'block';
+    updateProgressTelemetry();
+  }
+
   document.querySelectorAll('.sub-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.day-group').forEach(g => g.style.display = 'none');
-      btn.classList.add('active');
-      document.getElementById('day-pane-' + btn.dataset.day).style.display = 'block';
-      updateProgressTelemetry();
+      selectDay(btn.dataset.day);
       playTerminalBeep(500, 0.04);
     });
   });
@@ -839,13 +666,24 @@
     return Math.round(wt * (1 + reps / 30));
   }
 
+  // Bodyweight moves (pull ups, dips) log added kg; real load = latest weigh-in + added kg
+  function bodyweightKg() {
+    const history = JSON.parse(localStorage.getItem('apex_weight_history') || '[]');
+    return history.length ? history[history.length - 1].kg : 71.5;
+  }
+
+  function rowLoad(row) {
+    const wt = parseFloat(row.querySelector('.in-wt').value) || 0;
+    return row.closest('.instrument-card').dataset.bw ? wt + bodyweightKg() : wt;
+  }
+
   function attachTableListeners() {
     document.querySelectorAll('.order-table tr[data-set]').forEach(row => {
       const wtIn = row.querySelector('.in-wt');
       const rpIn = row.querySelector('.in-rp');
       const rmCell = row.querySelector('.rm-est');
       function update() {
-        const est = calcEpley(parseFloat(wtIn.value), parseFloat(rpIn.value));
+        const est = calcEpley(rowLoad(row), parseFloat(rpIn.value));
         rmCell.textContent = est + 'kg';
       }
       wtIn.addEventListener('input', update);
@@ -870,7 +708,7 @@
   }
 
   function updateProgressTelemetry() {
-    const activePane = document.querySelector('.day-group:not([style*="display: none"])');
+    const activePane = activeDayKey && document.getElementById('day-pane-' + activeDayKey);
     if (!activePane) return;
     const allButtons = activePane.querySelectorAll('.exec-btn');
     const filled = activePane.querySelectorAll('.exec-btn.filled');
@@ -878,11 +716,10 @@
 
     // Compute Session Tonnage
     let totalTons = 0;
-    document.querySelectorAll('.exec-btn.filled').forEach(btn => {
+    filled.forEach(btn => {
       const row = btn.closest('tr');
-      const wt = parseFloat(row.querySelector('.in-wt').value) || 0;
       const rp = parseFloat(row.querySelector('.in-rp').value) || 0;
-      totalTons += (wt * rp);
+      totalTons += (rowLoad(row) * rp);
     });
     document.getElementById('hud-tonnage').textContent = (totalTons / 1000).toFixed(2) + 't';
   }
@@ -935,24 +772,39 @@
     document.getElementById('hud-clock').textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
   }, 1000);
 
-  // CYCLE ROUTING STATUS
+  // WEEKLY SCHEDULE STATUS (Mon–Sat by weekday; Sunday gym closed)
+  function ledgerDateLabel(d) {
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
   function updateCycleStatus() {
-    const lastDay = parseInt(localStorage.getItem('apex_last_day') || '0', 10);
-    const names = { 1: 'DAY 1: CHEST/BACK', 2: 'DAY 2: LEGS/FOREARM', 3: 'DAY 3: SHOULDERS/ARMS' };
-    let nextDay = lastDay === 3 ? 1 : (lastDay + 1 || 1);
-    
+    const dow = new Date().getDay(); // 0 = Sunday
+    const today = PROGRAM.find(d => d.dow === dow);
+    const ledger = JSON.parse(localStorage.getItem('apex_ledger') || '[]');
+    const doneToday = today && ledger.some(l => l.day === today.key && l.date === ledgerDateLabel(new Date()));
+    const next = today && !doneToday ? today : (PROGRAM.find(d => d.dow > dow) || PROGRAM[0]);
+    const nextLabel = `${next.label} ${next.name.toUpperCase()}`;
+
     const banner = document.getElementById('cycle-text');
-    banner.textContent = names[nextDay];
+    if (!today) banner.textContent = `SUN · GYM CLOSED → ${nextLabel}`;
+    else if (doneToday) banner.textContent = `✓ DONE → ${nextLabel}`;
+    else banner.textContent = `${nextLabel} · ${next.focus.toUpperCase()}`;
+
+    document.getElementById('rest-day-note').style.display = today ? 'none' : 'block';
+    document.querySelectorAll('.sub-btn').forEach(b => {
+      b.classList.toggle('today', !!today && b.dataset.day === today.key);
+    });
     document.getElementById('cycle-banner').onclick = () => {
-      const btn = document.querySelector(`.sub-btn[data-day="${nextDay}"]`);
-      if (btn) btn.click();
+      selectDay(next.key);
+      playTerminalBeep(500, 0.04);
     };
+    return next;
   }
 
   // DATA PERSISTENCE & RECOVERY
   function saveSessionState() {
     const state = {};
-    document.querySelectorAll('.instrument-card').forEach(card => {
+    document.querySelectorAll('.instrument-card[data-exid]').forEach(card => {
       const exId = card.dataset.exid;
       state[exId] = [];
       card.querySelectorAll('tbody tr').forEach(row => {
@@ -991,19 +843,70 @@
     updateProgressTelemetry();
   }
 
+  // One-time carry-over of working weights from the old 3-day split (v2 card ids → new ids)
+  const LEGACY_WEIGHTS = {
+    d1_e1: ['pa_incline', 'pb_incline'], d1_e3: ['pa_mfly'], d1_e4: ['la_pulldown'],
+    d1_e5: ['la_cablerow'], d1_e6: ['la_lowrow'], d2_e1: ['lgb_legpress'],
+    d2_e2: ['lga_legext'], d2_e3: ['lga_legcurl', 'lgb_legcurl'], d2_e4: ['lgb_lunge'],
+    d3_e1: ['pb_shpress'], d3_e2: ['pa_lateral'], d3_e3: ['la_revfly'],
+    d3_e4: ['pa_ohext'], d3_e5: ['pb_1arm'], d3_e6: ['la_inclcurl'], d3_e7: ['lb_hammer']
+  };
+
+  function migrateLegacyWeights() {
+    if (localStorage.getItem('apex_program') === 'ppl6') return;
+    try {
+      const old = JSON.parse(localStorage.getItem('apex_current_state') || '{}');
+      Object.keys(LEGACY_WEIGHTS).forEach(oldId => {
+        const wt = old[oldId] && old[oldId][0] && old[oldId][0].wt;
+        if (!wt) return;
+        LEGACY_WEIGHTS[oldId].forEach(newId => {
+          document.querySelectorAll(`.instrument-card[data-exid="${newId}"] .in-wt`).forEach(input => {
+            input.value = wt;
+            input.dispatchEvent(new Event('input'));
+          });
+        });
+      });
+    } catch(e) {}
+    localStorage.setItem('apex_program', 'ppl6');
+    saveSessionState();
+  }
+
+  // DOUBLE PROGRESSION: every set logged at the top of the rep range → add load, reset reps to bottom
+  function applyProgression(pane) {
+    const progressed = [];
+    pane.querySelectorAll('.instrument-card[data-exid]').forEach(card => {
+      const ex = EXERCISE_INDEX[card.dataset.exid];
+      const rows = Array.from(card.querySelectorAll('tbody tr'));
+      const topped = rows.every(r =>
+        r.querySelector('.exec-btn').classList.contains('filled') &&
+        (parseFloat(r.querySelector('.in-rp').value) || 0) >= ex.hi
+      );
+      if (!topped) return;
+      rows.forEach(r => {
+        const wtIn = r.querySelector('.in-wt');
+        wtIn.value = Math.round(((parseFloat(wtIn.value) || 0) + ex.inc) * 100) / 100;
+        r.querySelector('.in-rp').value = ex.lo;
+        wtIn.dispatchEvent(new Event('input'));
+      });
+      progressed.push(`${ex.name} +${ex.inc}kg`);
+    });
+    return progressed;
+  }
+
   // COMPLETE WORKOUT INTO HISTORICAL LEDGER
-  function finalizeWorkoutSession(dayNum) {
-    const pane = document.getElementById('day-pane-' + dayNum);
+  function finalizeWorkoutSession(dayKey) {
+    const pane = document.getElementById('day-pane-' + dayKey);
+    const plan = PROGRAM.find(d => d.key === dayKey);
     let volumeTonnage = 0;
     let setsCount = 0;
 
     pane.querySelectorAll('.exec-btn.filled').forEach(btn => {
       const row = btn.closest('tr');
-      const wt = parseFloat(row.querySelector('.in-wt').value) || 0;
       const rp = parseFloat(row.querySelector('.in-rp').value) || 0;
-      volumeTonnage += (wt * rp);
+      volumeTonnage += (rowLoad(row) * rp);
       setsCount++;
     });
+    volumeTonnage = Math.round(volumeTonnage);
 
     if (setsCount === 0) {
       alert("No filled sets registered. Execute orders before finalizing.");
@@ -1013,15 +916,16 @@
     const ledger = JSON.parse(localStorage.getItem('apex_ledger') || '[]');
     const record = {
       id: Date.now(),
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      day: dayNum,
-      title: dayNum === 1 ? 'Chest & Back' : (dayNum === 2 ? 'Legs & Forearms' : 'Shoulders & Arms'),
+      date: ledgerDateLabel(new Date()),
+      day: dayKey,
+      title: `${plan.name} · ${plan.focus}`,
       tonnage: volumeTonnage,
       sets: setsCount
     };
     ledger.unshift(record);
     localStorage.setItem('apex_ledger', JSON.stringify(ledger));
-    localStorage.setItem('apex_last_day', String(dayNum));
+
+    const progressed = applyProgression(pane);
 
     // Clear filled states for next cycle
     pane.querySelectorAll('.exec-btn').forEach(b => {
@@ -1033,7 +937,8 @@
     updateProgressTelemetry();
     updateCycleStatus();
     playExecutionChime();
-    alert(`✓ SESSION STORED: ${volumeTonnage.toLocaleString()} kg Total Volume logged.`);
+    alert(`✓ SESSION STORED: ${volumeTonnage.toLocaleString()} kg Total Volume logged.` +
+      (progressed.length ? `\n\n▲ TOP OF RANGE HIT — LOAD UP NEXT TIME:\n${progressed.join('\n')}` : ''));
   }
 
   function renderLedger() {
@@ -1094,11 +999,19 @@
 
   function renderTonnageChart() {
     const { ctx, width, height } = setupCanvas('canvas-tonnage');
-    const ledger = JSON.parse(localStorage.getItem('apex_ledger') || '[]').slice(0, 8).reverse();
-    
+    const all = JSON.parse(localStorage.getItem('apex_ledger') || '[]');
+    const ledger = all.slice(0, 8).reverse();
+
     // Fallback demo points if empty
     const data = ledger.length ? ledger.map(l => l.tonnage) : [4200, 4600, 4400, 4850, 5100, 5350];
     const labels = ledger.length ? ledger.map(l => l.date) : ['Sess 1', 'Sess 2', 'Sess 3', 'Sess 4', 'Sess 5', 'Sess 6'];
+    // Each session is compared with the previous session of the same workout day
+    const ups = ledger.length
+      ? ledger.map(l => {
+          const prev = all.slice(all.indexOf(l) + 1).find(p => p.day === l.day);
+          return !prev || l.tonnage >= prev.tonnage;
+        })
+      : data.map((val, i) => i === 0 || val >= data[i - 1]);
 
     ctx.clearRect(0, 0, width, height);
 
@@ -1117,7 +1030,7 @@
       const x = 45 + i * ((width - 60) / data.length);
       const barH = (val / max) * (height - 40);
       const y = height - 25 - barH;
-      const isUp = i === 0 ? true : val >= data[i - 1];
+      const isUp = ups[i];
 
       // Financial Candlestick / Bar
       ctx.fillStyle = isUp ? '#00F59B' : '#FF3366';
@@ -1219,6 +1132,23 @@
     document.getElementById('calc-plate-out').textContent = result.length ? result.join(' + ') : 'Empty Bar';
   }
 
+  // WEEKLY VOLUME MAP (fractional sets per muscle, from PROGRAM)
+  function renderVolumeMap() {
+    const totals = {};
+    PROGRAM.forEach(d => d.ex.forEach(e => {
+      Object.keys(e.m).forEach(muscle => {
+        totals[muscle] = (totals[muscle] || 0) + e.sets * e.m[muscle];
+      });
+    }));
+    document.getElementById('volume-map').innerHTML = Object.keys(totals)
+      .sort((a, b) => totals[b] - totals[a])
+      .map(muscle => {
+        const sets = totals[muscle];
+        const color = sets >= 10 ? 'var(--bull)' : (sets >= 6 ? 'var(--gold)' : 'var(--text-muted)');
+        return `<div class="vol-row"><span>${muscle}</span><div class="vol-track"><div class="vol-fill" style="width:${Math.min(sets / 20, 1) * 100}%; background:${color};"></div></div><b style="color:${color};">${sets}</b></div>`;
+      }).join('');
+  }
+
   // EXPORT JSON DATA LEDGER
   function exportData() {
     const payload = {
@@ -1238,7 +1168,9 @@
   window.addEventListener('DOMContentLoaded', () => {
     attachTableListeners();
     loadSessionState();
-    updateCycleStatus();
+    migrateLegacyWeights();
+    selectDay(updateCycleStatus().key);
+    renderVolumeMap();
   });
 
   if ('serviceWorker' in navigator) {
