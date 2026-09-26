@@ -1,4 +1,4 @@
-const CACHE_NAME = 'apex-terminal-v2';
+const CACHE_NAME = 'apex-terminal-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -35,14 +35,6 @@ self.addEventListener('fetch', (event) => {
           return response;
         })
         .catch(() => cached);
-      return cached || fetchPromise;
-    })
-  );
-});
-          caches.open(CACHE_NAME).then(function (cache) { cache.put(event.request, clone); });
-        }
-        return response;
-      }).catch(function () { return cached; });
       return cached || fetchPromise;
     })
   );
