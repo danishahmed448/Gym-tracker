@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2160 1100" width="2160" height="1100" role="img" aria-labelledby="ttl dsc" font-family="Arial, Helvetica, 'Liberation Sans', 'DejaVu Sans', sans-serif">
+<title id="ttl">Sheet 1 of 2 - Battery system</title>
+<desc id="dsc">A 5 V source feeds the CN3303 boost charger, which charges a 3S Li-ion pack through a BMS. The pack goes through a fuse and master switch to the motor driver, the NPK sensor, a 5 V buck converter and a resistor divider that lets the Arduino measure battery percentage.</desc>
+<defs><marker id="ahdc2626" viewBox="0 0 14 14" refX="12" refY="7" markerWidth="14" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L13,7 L0,13 Z" fill="#dc2626"/></marker><marker id="ahea580c" viewBox="0 0 14 14" refX="12" refY="7" markerWidth="14" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L13,7 L0,13 Z" fill="#ea580c"/></marker></defs>
+<rect width="2160" height="1100" fill="#ffffff"/>
+<rect x="8" y="8" width="2144" height="1084" rx="4" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+<text x="2132" y="1076" font-size="12" fill="#6b7280" text-anchor="end">Rover electronics  ·  Sheet 1 of 2  ·  rev A  ·  2026-10-03</text>
+<text x="60" y="54" font-size="28" fill="#111827" font-weight="700">Sheet 1 of 2 — Battery system</text>
+<text x="60" y="82" font-size="16" fill="#6b7280">Charge (CN3303)  →  protect (3S BMS)  →  fuse &amp; switch  →  distribute  →  measure battery %</text>
+<rect x="1500" y="34" width="110.561" height="22" rx="5" fill="#fee2e2" stroke="#dc2626" stroke-width="1.8"/>
+<text x="1555.28" y="49.5" font-size="12.5" fill="#991b1b" text-anchor="middle" font-weight="700">VBAT 9–12.6 V</text>
+<rect x="1618.56" y="34" width="36.5975" height="22" rx="5" fill="#ffedd5" stroke="#ea580c" stroke-width="1.8"/>
+<text x="1636.86" y="49.5" font-size="12.5" fill="#9a3412" text-anchor="middle" font-weight="700">5 V</text>
+<rect x="1663.16" y="34" width="48.1" height="22" rx="5" fill="#fce7f3" stroke="#db2777" stroke-width="1.8"/>
+<text x="1687.21" y="49.5" font-size="12.5" fill="#9d174d" text-anchor="middle" font-weight="700">3.3 V</text>
+<rect x="1719.26" y="34" width="43.285" height="22" rx="5" fill="#e5e7eb" stroke="#111827" stroke-width="1.8"/>
+<text x="1740.9" y="49.5" font-size="12.5" fill="#111827" text-anchor="middle" font-weight="700">GND</text>
+<text x="1776.54" y="50" font-size="12.5" fill="#6b7280">arrows = direction of power flow</text>
+<rect x="60" y="210" width="190" height="140" rx="9" fill="#f8fafc" stroke="#475569" stroke-width="2.2"/>
+<path d="M60,242 V219 a9,9 0 0 1 9,-9 H241 a9,9 0 0 1 9,9 V242 Z" fill="#475569"/>
+<text x="155" y="231.76" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="700">5 V source</text>
+<text x="155" y="259" font-size="12.5" fill="#6b7280" text-anchor="middle">USB adapter or</text>
+<text x="155" y="275" font-size="12.5" fill="#6b7280" text-anchor="middle">power bank</text>
+<text x="155" y="336" font-size="11.5" fill="#6b7280" text-anchor="middle">≥ 2 A · 3–6 V accepted</text>
+<polyline points="250,270 350,270" fill="none" stroke="#ea580c" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#ahea580c)"/>
+<polyline points="250,310 350,310" fill="none" stroke="#111827" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="250" cy="270" r="4.6" fill="#ffffff" stroke="#111827" stroke-width="2.2"/>
+<text x="238" y="275" font-size="14" fill="#111827" text-anchor="end" font-weight="700" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">+</text>
+<circle cx="250" cy="310" r="4.6" fill="#ffffff" stroke="#111827" stroke-width="2.2"/>
+<text x="238" y="315" font-size="14" fill="#111827" text-anchor="end" font-weight="700" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">−</text>
+<text x="300" y="256" font-size="12.5" fill="#9a3412" text-anchor="middle" font-weight="700" stroke="#ffffff" stroke-width="4" stroke-linejoin="round" paint-order="stroke">5 V in</text>
+<rect x="350" y="170" width="320" height="210" rx="9" fill="#f8fafc" stroke="#0f766e" stroke-width="2.2"/>
+<path d="M350,202 V179 a9,9 0 0 1 9,-9 H661 a9,9 0 0 1 9,9 V202 Z" fill="#0f766e"/>
+<text x="510" y="191.76" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="700">CN3303 boost charger</text>
+<text x="510" y="219" font-size="12.5" fill="#6b7280" text-anchor="middle">PFM step-up · 5 V in → 12.6 V out</text>
+<text x="510" y="235" font-size="12.5" fill="#6b7280" text-anchor="middle">CC / quasi-CV charging of 3 Li-ion cells</text>
+<circle cx="350" cy="270" r="4.6" fill="#ffffff" stroke="#111827" stroke-width="2.2"/>
+<text x="362" y="275" font-size="14" fill="#111827" font-weight="700" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">IN+</text>
+<circle cx="350" cy="310" r="4.6" fill="#ffffff" stroke="#111827" stroke-width="2.2"/>
+<text x="362" y="315" font-size="14" fill="#111827" font-weight="700" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">IN−</text>
+<circle cx="670" cy="270" r="4.6" fill="#ffffff" stroke="#111827" stroke-width="2.2"/>
+<text x="658" y="275" font-size="14" fill="#111827" text-anchor="end" font-weight="700" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">B+</text>
+<circle cx="670" cy="310" r="4.6" fill="#ffffff" stroke="#111827" stroke-width="2.2"/>
+<text x="658" y="315" font-size="14" fill="#111827" text-anchor="end" font-weight="700" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">B−</text>
+<line x1="404" y1="310" x2="616" y2="310" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="5 4"/>
+<text x="510" y="302" font-size="11" fill="#6b7280" text-anchor="middle">IN− and B− are common</text>
+<circle cx="392" cy="352" r="7.5" fill="#ef4444" stroke="#111827" stroke-width="1.6"/>
+<text x="406" y="357" font-size="12" fill="#374151">CR  charging</text>
+<circle cx="534" cy="352" r="7.5" fill="#22c55e" stroke="#111827" stroke-width="1.6"/>
+<text x="548" y="357" font-size="12" fill="#374151">OK  full / CV</text>
+<text x="510" y="232" font-size="1" fill="#111827"></text>
+<polyline points="670,270 720,270 720,170 1150,170" fill="none" stroke="#dc2626" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#ahdc2626)"/>
+<text x="935" y="156" font-size="12.5" fill="#991b1b" text-anchor="middle" font-weight="700" stroke="#ffffff" stroke-width="4" stroke-linejoin="round" paint-order="stroke">charging ≈ 0.7 A max, tapering as the pack reaches 12.6 V</text>
+<text x="935" y="196" font-size="11.5" fill="#6b7280" text-anchor="middle">charger and load share B+ and P− on the BMS</text>
+<polyline points="670,310 780,310" fill="none" stroke="#111827" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="730" cy="310" r="4.6" fill="#111827" stroke="#111827" stroke-width="1"/>
+<line x1="730" y1="310" x2="730" y2="344" stroke="#111827" stroke-width="2.6" stroke-linecap="round"/>
+<rect x="707.812" y="344" width="44.3764" height="22" rx="5" fill="#e5e7eb" stroke="#111827" stroke-width="1.8"/>
+<text x="730" y="359.6" font-size="13" fill="#111827" text-anchor="middle" font-weight="700">GND</text>
+<text x="730" y="396" font-size="12.5" fill="#111827" text-anchor="middle" font-weight="700">★ star point</text>
+<text x="730" y="412" font-size="11" fill="#6b7280" text-anchor="middle">every GND returns here</text>
+<rect x="780" y="230" width="340" height="140" rx="9" fill="#f8fafc" stroke="#1e40af" stroke-width="2.2"/>
+<path d="M780,262 V239 a9,9 0 0 1 9,-9 H1111 a9,9 0 0 1 9,9 V262 Z" fill="#1e40af"/>
+<text x="950" y="251.76" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="700">3S BMS (with balancing)</text>
+<text x="950" y="279" font-size="12.5" fill="#6b7280" text-anchor="middle">over-charge · over-discharge · over-current · short</text>
+<circle cx="780" cy="310" r="4.6" fill="#ffffff" stroke="#111827" stroke-width="2.2"/>
+<text x="792" y="315" font-size="14" fill="#111827" font-weight="700" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">P−</text>
+<circle cx="1120" cy="290" r="4.6" fill="#ffffff" stroke="#111827" stroke-width="2.2"/>
+<text x="1108" y="295" font-size="14" fill="#111827" text-anchor="end" font-weight="700" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">B+</text>
+<circle cx="840" cy="370" r="4.6" fill="#ffffff" stroke="#111827" stroke-width="2.2"/>
+<text x="840" y="358" font-size="14" fill="#111827" text-anchor="middle" font-weight="700" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">B−</text>
+<circle cx="950" cy="370" r="4.6" fill="#ffffff" stroke="#111827" stroke-width="2.2"/>
+<text x="950" y="358" font-size="14" fill="#111827" text-anchor="middle" font-weight="700" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">B1</text>
+<circle cx="1060" cy="370" r="4.6" fill="#ffffff" stroke="#111827" stroke-width="2.2"/>
+<text x="1060" y="358" font-size="14" fill="#111827" text-anchor="middle" font-weight="700" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">B2</text>
+<rect x="805" y="452" width="400" height="196" rx="8" fill="none" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="6 5"/>
+<polyline points="840,370 840,500" fill="none" stroke="#111827" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="950,370 950,500" fill="none" stroke="#475569" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1060,370 1060,500" fill="none" stroke="#475569" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="840" y1="500" x2="890" y2="500" stroke="#111827" stroke-width="2.8" stroke-linecap="round"/>
+<line x1="900" y1="500" x2="950" y2="500" stroke="#111827" stroke-width="2.8" stroke-linecap="round"/>
+<line x1="890" y1="490" x2="890" y2="510" stroke="#111827" stroke-width="3.6" stroke-linecap="round"/>
+<line x1="900" y1="482" x2="900" y2="518" stroke="#111827" stroke-width="3.6" stroke-linecap="round"/>
+<text x="909" y="480" font-size="14" fill="#111827" font-weight="800">+</text>
+<line x1="950" y1="500" x2="1000" y2="500" stroke="#111827" stroke-width="2.8" stroke-linecap="round"/>
+<line x1="1010" y1="500" x2="1060" y2="500" stroke="#111827" stroke-width="2.8" stroke-linecap="round"/>
+<line x1="1000" y1="490" x2="1000" y2="510" stroke="#111827" stroke-width="3.6" stroke-linecap="round"/>
+<line x1="1010" y1="482" x2="1010" y2="518" stroke="#111827" stroke-width="3.6" stroke-linecap="round"/>
+<text x="1019" y="480" font-size="14" fill="#111827" font-weight="800">+</text>
+<line x1="1060" y1="500" x2="1110" y2="500" stroke="#111827" stroke-width="2.8" stroke-linecap="round"/>
+<line x1="1120" y1="500" x2="1170" y2="500" stroke="#111827" stroke-width="2.8" stroke-linecap="round"/>
+<line x1="1110" y1="490" x2="1110" y2="510" stroke="#111827" stroke-width="3.6" stroke-linecap="round"/>
+<line x1="1120" y1="482" x2="1120" y2="518" stroke="#111827" stroke-width="3.6" stroke-linecap="round"/>
+<text x="1129" y="480" font-size="14" fill="#111827" font-weight="800">+</text>
+<circle cx="840" cy="500" r="4.6" fill="#111827" stroke="#111827" stroke-width="1"/>
+<text x="840" y="540" font-size="13" fill="#111827" text-anchor="middle" font-weight="700" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">B−</text>
+<text x="840" y="556" font-size="12" fill="#374151" text-anchor="middle">0 V</text>
+<circle cx="950" cy="500" r="4.6" fill="#111827" stroke="#111827" stroke-width="1"/>
+<text x="950" y="540" font-size="13" fill="#111827" text-anchor="middle" font-weight="700" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">B1</text>
+<text x="950" y="556" font-size="12" fill="#374151" text-anchor="middle">4.2 V</text>
+<circle cx="1060" cy="500" r="4.6" fill="#111827" stroke="#111827" stroke-width="1"/>
+<text x="1060" y="540" font-size="13" fill="#111827" text-anchor="middle" font-weight="700" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">B2</text>
+<text x="1060" y="556" font-size="12" fill="#374151" text-anchor="middle">8.4 V</text>
+<circle cx="1170" cy="500" r="4.6" fill="#111827" stroke="#111827" stroke-width="1"/>
+<text x="1170" y="540" font-size="13" fill="#111827" text-anchor="middle" font-weight="700" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">B+</text>
+<text x="1170" y="556" font-size="12" fill="#374151" text-anchor="middle">12.6 V</text>
+<text x="895" y="540" font-size="11.5" fill="#6b7280" text-anchor="middle">cell 1</text>
+<text x="1005" y="540" font-size="11.5" fill="#6b7280" text-anchor="middle">cell 2</text>
+<text x="1115" y="540" font-size="11.5" fill="#6b7280" text-anchor="middle">cell 3</text>
+<text x="1005" y="596" font-size="13" fill="#111827" text-anchor="middle" font-weight="700">3S Li-ion pack · 3 × 18650 in series (or 3S LiPo)</text>
+<text x="1005" y="614" font-size="11.5" fill="#6b7280" text-anchor="middle">full 12.6 V … empty 9.6 V here (3.2 V per cell)</text>
+<text x="1005" y="632" font-size="11.5" fill="#6b7280" text-anchor="middle">node voltages at full charge · B1, B2 = balance leads</text>
+<polyline points="1120,290 1170,290" fill="none" stroke="#dc2626" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1170,500 1170,170" fill="none" stroke="#dc2626" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1170" cy="290" r="4.6" fill="#dc2626" stroke="#dc2626" stroke-width="1"/>
+<circle cx="1170" cy="500" r="4.6" fill="#dc2626" stroke="#dc2626" stroke-width="1"/>
+<circle cx="1170" cy="170" r="4.6" fill="#dc2626" stroke="#dc2626" stroke-width="1"/>
+<polyline points="1170,170 1262,170" fill="none" stroke="#dc2626" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="1262" y="160" width="56" height="20" rx="3" fill="#fff" stroke="#111827" stroke-width="2.6"/>
+<line x1="1262" y1="170" x2="1318" y2="170" stroke="#111827" stroke-width="2" stroke-linecap="round"/>
+<polyline points="1318,170 1396,170" fill="none" stroke="#dc2626" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1396" cy="170" r="4.2" fill="#111827" stroke="#111827" stroke-width="1"/>
+<circle cx="1464" cy="170" r="4.2" fill="#fff" stroke="#111827" stroke-width="2.4"/>
+<line x1="1396" y1="170" x2="1454" y2="146" stroke="#111827" stroke-width="3" stroke-linecap="round"/>
+<polyline points="1464,170 1540,170" fill="none" stroke="#dc2626" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#ahdc2626)"/>
+<text x="1290" y="134" font-size="12.5" fill="#111827" text-anchor="middle" font-weight="700">F1 · 5 A fuse</text>
+<text x="1430" y="120" font-size="12.5" fill="#111827" text-anchor="middle" font-weight="700">SW1 · master switch (≥ 5 A)</text>
+<text x="1430" y="208" font-size="11.5" fill="#991b1b" text-anchor="middle" font-style="italic">turn OFF while charging</text>
+<text x="1184" y="192" font-size="11.5" fill="#6b7280">PACK+</text>
+<circle cx="1540" cy="170" r="4.6" fill="#dc2626" stroke="#dc2626" stroke-width="1"/>
+<polyline points="1540,170 1540,740 1650,740" fill="none" stroke="#dc2626" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1554" y="196" font-size="12.5" fill="#991b1b" font-weight="700">VBAT_SW</text>
+<text x="1554" y="212" font-size="11.5" fill="#6b7280">after SW1: 9.0–12.6 V</text>
+<circle cx="1540" cy="250" r="4.6" fill="#dc2626" stroke="#dc2626" stroke-width="1"/>
+<circle cx="1540" cy="320" r="4.6" fill="#dc2626" stroke="#dc2626" stroke-width="1"/>
+<circle cx="1540" cy="490" r="4.6" fill="#dc2626" stroke="#dc2626" stroke-width="1"/>
+<polyline points="1540,250 1630,250" fill="none" stroke="#dc2626" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#ahdc2626)"/>
+<polygon points="1630,237 1968,237 1980,250 1968,263 1630,263" fill="#fee2e2" stroke="#dc2626" stroke-width="1.8" stroke-linejoin="round"/>
+<text x="1640" y="254.68" font-size="13" fill="#991b1b" font-weight="600">L298N +12V (VS), motor power · Sheet 2</text>
+<polyline points="1540,320 1630,320" fill="none" stroke="#dc2626" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#ahdc2626)"/>
+<polygon points="1630,307 1968,307 1980,320 1968,333 1630,333" fill="#fee2e2" stroke="#dc2626" stroke-width="1.8" stroke-linejoin="round"/>
+<text x="1640" y="324.68" font-size="13" fill="#991b1b" font-weight="600">NPK sensor V+ · Sheet 2</text>
+<text x="1630" y="352" font-size="11.5" fill="#6b7280">needs 9–24 V: fine while the pack stays above ≈ 10 V</text>
+<polyline points="1540,490 1640,490" fill="none" stroke="#dc2626" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#ahdc2626)"/>
+<rect x="1640" y="400" width="200" height="150" rx="9" fill="#f8fafc" stroke="#0f766e" stroke-width="2.2"/>
+<path d="M1640,432 V409 a9,9 0 0 1 9,-9 H1831 a9,9 0 0 1 9,9 V432 Z" fill="#0f766e"/>
+<text x="1740" y="421.76" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="700">Buck converter</text>
+<text x="1740" y="449" font-size="12.5" fill="#6b7280" text-anchor="middle">LM2596 / MP1584 module</text>
+<text x="1740" y="465" font-size="12.5" fill="#6b7280" text-anchor="middle">9–12.6 V → 5.0 V · ≥ 1 A</text>
+<circle cx="1640" cy="490" r="4.6" fill="#ffffff" stroke="#111827" stroke-width="2.2"/>
+<text x="1652" y="495" font-size="14" fill="#111827" font-weight="700" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">IN+</text>
+<circle cx="1640" cy="520" r="4.6" fill="#ffffff" stroke="#111827" stroke-width="2.2"/>
+<text x="1652" y="525" font-size="14" fill="#111827" font-weight="700" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">IN−</text>
+<circle cx="1840" cy="490" r="4.6" fill="#ffffff" stroke="#111827" stroke-width="2.2"/>
+<text x="1828" y="495" font-size="14" fill="#111827" text-anchor="end" font-weight="700" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">OUT+</text>
+<circle cx="1840" cy="520" r="4.6" fill="#ffffff" stroke="#111827" stroke-width="2.2"/>
+<text x="1828" y="525" font-size="14" fill="#111827" text-anchor="end" font-weight="700" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">OUT−</text>
+<line x1="1700" y1="520" x2="1780" y2="520" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="5 4"/>
+<line x1="1640" y1="520" x2="1616" y2="520" stroke="#111827" stroke-width="2.6" stroke-linecap="round"/>
+<rect x="1571.62" y="509" width="44.3764" height="22" rx="5" fill="#e5e7eb" stroke="#111827" stroke-width="1.8"/>
+<text x="1593.81" y="524.6" font-size="13" fill="#111827" text-anchor="middle" font-weight="700">GND</text>
+<path d="M1654,573.0 L1666.1,593.35 L1641.9,593.35 Z" fill="#fbbf24" stroke="#92400e" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" />
+<text x="1654" y="590.82" font-size="13" fill="#451a03" text-anchor="middle" font-weight="800">!</text>
+<text x="1676" y="581" font-size="12.5" fill="#92400e" font-weight="700">Set the output to 5.00 V with</text>
+<text x="1676" y="598" font-size="12.5" fill="#92400e" font-weight="700">a multimeter BEFORE connecting</text>
+<text x="1676" y="615" font-size="12.5" fill="#92400e" font-weight="700">the Arduino or any sensor.</text>
+<polyline points="1840,490 1890,490" fill="none" stroke="#ea580c" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1890,440 1890,640" fill="none" stroke="#ea580c" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1890" cy="490" r="4.6" fill="#ea580c" stroke="#ea580c" stroke-width="1"/>
+<text x="1930" y="418" font-size="12.5" fill="#9a3412" font-weight="700">5 V rail feeds (Sheet 2)</text>
+<polyline points="1890,440 1930,440" fill="none" stroke="#ea580c" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1890" cy="440" r="3.6" fill="#ea580c" stroke="#ea580c" stroke-width="1"/>
+<rect x="1930" y="426" width="190" height="28" rx="6" fill="#ffedd5" stroke="#ea580c" stroke-width="1.8"/>
+<text x="1939" y="444.5" font-size="12.5" fill="#9a3412" font-weight="600">Arduino 5V pin</text>
+<polyline points="1890,480 1930,480" fill="none" stroke="#ea580c" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1890" cy="480" r="3.6" fill="#ea580c" stroke="#ea580c" stroke-width="1"/>
+<rect x="1930" y="466" width="190" height="28" rx="6" fill="#ffedd5" stroke="#ea580c" stroke-width="1.8"/>
+<text x="1939" y="484.5" font-size="12.5" fill="#9a3412" font-weight="600">HX710B VCC</text>
+<polyline points="1890,520 1930,520" fill="none" stroke="#ea580c" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1890" cy="520" r="3.6" fill="#ea580c" stroke="#ea580c" stroke-width="1"/>
+<rect x="1930" y="506" width="190" height="28" rx="6" fill="#ffedd5" stroke="#ea580c" stroke-width="1.8"/>
+<text x="1939" y="524.5" font-size="12.5" fill="#9a3412" font-weight="600">DHT22 VCC + R3 pull-up</text>
+<polyline points="1890,560 1930,560" fill="none" stroke="#ea580c" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1890" cy="560" r="3.6" fill="#ea580c" stroke="#ea580c" stroke-width="1"/>
+<rect x="1930" y="546" width="190" height="28" rx="6" fill="#ffedd5" stroke="#ea580c" stroke-width="1.8"/>
+<text x="1939" y="564.5" font-size="12.5" fill="#9a3412" font-weight="600">MAX485 VCC</text>
+<polyline points="1890,600 1930,600" fill="none" stroke="#ea580c" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1890" cy="600" r="3.6" fill="#ea580c" stroke="#ea580c" stroke-width="1"/>
+<rect x="1930" y="586" width="190" height="28" rx="6" fill="#ffedd5" stroke="#ea580c" stroke-width="1.8"/>
+<text x="1939" y="604.5" font-size="12.5" fill="#9a3412" font-weight="600">L298N +5V (logic)</text>
+<polyline points="1890,640 1930,640" fill="none" stroke="#ea580c" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1890" cy="640" r="3.6" fill="#ea580c" stroke="#ea580c" stroke-width="1"/>
+<rect x="1930" y="626" width="190" height="28" rx="6" fill="#ffedd5" stroke="#ea580c" stroke-width="1.8"/>
+<text x="1939" y="644.5" font-size="12.5" fill="#9a3412" font-weight="600">AMS1117 IN → radio 3.3 V</text>
+<rect x="1100" y="690" width="1020" height="340" rx="8" fill="none" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="6 5"/>
+<text x="1116" y="716" font-size="14" fill="#111827" font-weight="700">Battery-% sensor (analog)</text>
+<rect x="1116" y="734" width="386" height="24" rx="4" fill="#e2e8f0" stroke="none" stroke-width="0"/>
+<text x="1130" y="751" font-size="12.5" fill="#111827" font-weight="700">pack</text>
+<text x="1232" y="751" font-size="12.5" fill="#111827" font-weight="700">at A0</text>
+<text x="1330" y="751" font-size="12.5" fill="#111827" font-weight="700">ADC</text>
+<text x="1420" y="751" font-size="12.5" fill="#111827" font-weight="700">charge</text>
+<text x="1130" y="780" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">12.6 V</text>
+<text x="1232" y="780" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">4.20 V</text>
+<text x="1330" y="780" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">859</text>
+<text x="1420" y="780" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">100 %</text>
+<rect x="1116" y="789" width="386" height="24" rx="4" fill="#f1f5f9" stroke="none" stroke-width="0"/>
+<text x="1130" y="806" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">12.0 V</text>
+<text x="1232" y="806" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">4.00 V</text>
+<text x="1330" y="806" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">818</text>
+<text x="1420" y="806" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">80 %</text>
+<text x="1130" y="832" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">11.5 V</text>
+<text x="1232" y="832" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">3.83 V</text>
+<text x="1330" y="832" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">784</text>
+<text x="1420" y="832" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">50 %</text>
+<rect x="1116" y="841" width="386" height="24" rx="4" fill="#f1f5f9" stroke="none" stroke-width="0"/>
+<text x="1130" y="858" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">11.1 V</text>
+<text x="1232" y="858" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">3.70 V</text>
+<text x="1330" y="858" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">757</text>
+<text x="1420" y="858" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">15 %</text>
+<text x="1130" y="884" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">10.5 V</text>
+<text x="1232" y="884" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">3.50 V</text>
+<text x="1330" y="884" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">716</text>
+<text x="1420" y="884" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">5 %</text>
+<rect x="1116" y="893" width="386" height="24" rx="4" fill="#f1f5f9" stroke="none" stroke-width="0"/>
+<text x="1130" y="910" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">9.6 V</text>
+<text x="1232" y="910" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">3.20 V</text>
+<text x="1330" y="910" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">655</text>
+<text x="1420" y="910" font-size="13" fill="#374151" font-family="'DejaVu Sans Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace">0 % empty</text>
+<text x="1120" y="940" font-size="11.5" fill="#6b7280">Typical 18650 cells at rest, ±10 %. Calibrate against a multimeter,</text>
+<text x="1120" y="957" font-size="11.5" fill="#6b7280">and keep the buck at 5.00 V because it is also the ADC reference.</text>
+<line x1="1650" y1="740" x2="1650" y2="773" stroke="#111827" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1650" y1="807" x2="1650" y2="840" stroke="#111827" stroke-width="2.6" stroke-linecap="round"/>
+<rect x="1642.5" y="773" width="15" height="34" rx="2" fill="#fff" stroke="#111827" stroke-width="2.6"/>
+<line x1="1650" y1="840" x2="1650" y2="873" stroke="#111827" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1650" y1="907" x2="1650" y2="940" stroke="#111827" stroke-width="2.6" stroke-linecap="round"/>
+<rect x="1642.5" y="873" width="15" height="34" rx="2" fill="#fff" stroke="#111827" stroke-width="2.6"/>
+<circle cx="1650" cy="840" r="4.6" fill="#b91c1c" stroke="#b91c1c" stroke-width="1"/>
+<polyline points="1650,840 1820,840" fill="none" stroke="#b91c1c" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1770" cy="840" r="4.6" fill="#b91c1c" stroke="#b91c1c" stroke-width="1"/>
+<line x1="1770" y1="840" x2="1770" y2="885" stroke="#111827" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1770" y1="895" x2="1770" y2="940" stroke="#111827" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1757" y1="885" x2="1783" y2="885" stroke="#111827" stroke-width="3.2" stroke-linecap="round"/>
+<line x1="1757" y1="895" x2="1783" y2="895" stroke="#111827" stroke-width="3.2" stroke-linecap="round"/>
+<polyline points="1650,940 1770,940" fill="none" stroke="#111827" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1770" cy="940" r="4.6" fill="#111827" stroke="#111827" stroke-width="1"/>
+<circle cx="1650" cy="940" r="4.6" fill="#111827" stroke="#111827" stroke-width="1"/>
+<line x1="1650" y1="940" x2="1650" y2="968" stroke="#111827" stroke-width="2.6" stroke-linecap="round"/>
+<rect x="1627.81" y="968" width="44.3764" height="22" rx="5" fill="#e5e7eb" stroke="#111827" stroke-width="1.8"/>
+<text x="1650" y="983.6" font-size="13" fill="#111827" text-anchor="middle" font-weight="700">GND</text>
+<polygon points="1820,827 1958,827 1970,840 1958,853 1820,853" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.8" stroke-linejoin="round"/>
+<text x="1830" y="844.68" font-size="13" fill="#991b1b" font-weight="600">to A0 · Sheet 2</text>
+<text x="1668" y="786" font-size="13" fill="#111827" font-weight="700" stroke="#ffffff" stroke-width="4" stroke-linejoin="round" paint-order="stroke">R1</text>
+<text x="1668" y="802" font-size="12" fill="#374151" stroke="#ffffff" stroke-width="4" stroke-linejoin="round" paint-order="stroke">20 kΩ 1 %</text>
+<text x="1668" y="886" font-size="13" fill="#111827" font-weight="700" stroke="#ffffff" stroke-width="4" stroke-linejoin="round" paint-order="stroke">R2</text>
+<text x="1668" y="902" font-size="12" fill="#374151" stroke="#ffffff" stroke-width="4" stroke-linejoin="round" paint-order="stroke">10 kΩ 1 %</text>
+<text x="1788" y="886" font-size="13" fill="#111827" font-weight="700" stroke="#ffffff" stroke-width="4" stroke-linejoin="round" paint-order="stroke">C</text>
+<text x="1788" y="902" font-size="12" fill="#374151" stroke="#ffffff" stroke-width="4" stroke-linejoin="round" paint-order="stroke">100 nF</text>
+<text x="1862" y="912" font-size="14" fill="#111827" font-weight="700">V(A0) = VBAT ÷ 3</text>
+<text x="1862" y="932" font-size="12.5" fill="#374151">VBAT = ADC × 5.00 / 1023 × 3</text>
+<text x="1862" y="952" font-size="12.5" fill="#374151">divider drains 0.42 mA at 12.6 V</text>
+<text x="1862" y="972" font-size="12.5" fill="#374151">6.7 kΩ source: fine for the ADC</text>
+<text x="1660" y="727" font-size="12" fill="#991b1b" font-weight="700">VBAT_SW</text>
+<text x="60" y="700" font-size="15" fill="#111827" font-weight="700">Read before powering up</text>
+<text x="60" y="724" font-size="13.5" fill="#374151">1.  The CN3303 is a BOOST charger: its input is 3–6 V. Feed it 5 V at ≥ 2 A; anything above 6 V can destroy it.</text>
+<text x="60" y="746" font-size="13.5" fill="#374151">2.  It neither balances nor protects the cells. The 3S BMS must sit between the pack, the charger and every load.</text>
+<text x="60" y="768" font-size="13.5" fill="#374151">3.  Charge with SW1 OFF: a running load starves the charger and it cannot see end-of-charge.</text>
+<text x="60" y="790" font-size="13.5" fill="#374151">4.  Keep F1 close to the pack so a short downstream cannot start a fire; use wire rated for the current (≥ 0.5 mm²).</text>
+<text x="60" y="812" font-size="13.5" fill="#374151">5.  Upload code over USB with SW1 OFF, and never power the 5V pin and USB at the same time.</text>
+<text x="60" y="834" font-size="13.5" fill="#374151">6.  Battery % is valid only with the motors idle and the charger unplugged: the pack sags under load and rises on charge.</text>
+<text x="60" y="856" font-size="13.5" fill="#374151">7.  Wire polarity first, power second: a reversed pack destroys the buck, the L298N and the Arduino.</text>
+<text x="60" y="912" font-size="15" fill="#111827" font-weight="700">Bring-up checks with a multimeter (before the Arduino is plugged in)</text>
+<text x="60" y="936" font-size="13.5" fill="#374151">a.  SW1 OFF, 5 V into the charger: CR LED lights and B+ to GND climbs toward 12.6 V as the pack fills.</text>
+<text x="60" y="958" font-size="13.5" fill="#374151">b.  SW1 ON: VBAT_SW to GND equals the pack voltage (9.6–12.6 V).</text>
+<text x="60" y="980" font-size="13.5" fill="#374151">c.  Buck OUT+ to GND: trim to 5.00 V before wiring any 5 V load.</text>
+<text x="60" y="1002" font-size="13.5" fill="#374151">d.  Divider mid-point to GND: VBAT ÷ 3 (about 3.70 V at 11.1 V).</text>
+</svg>
